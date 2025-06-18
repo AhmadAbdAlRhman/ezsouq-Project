@@ -2,7 +2,10 @@ const connectDB = require('../config/db');
 
 connectDB();
 
-// require('./Governorates');
 require('./users');
+require('./email_user');
+require('./google_user');
+require('./Category');
+// require('./Governorates');
 // require('./products');
 // require('./feedback');

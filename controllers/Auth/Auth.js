@@ -1,4 +1,4 @@
-const User = require("../../models/users");
+const User = require("../../models/email_user");
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const {
@@ -20,13 +20,13 @@ module.exports.register = async (req, res) => {
         });
 
         const user = await User.create({
-            first_name: name,
+            name,
             infoContact,
             password
         });
         res.status(201).json({
             _id: user._id,
-            name: user.first_name,
+            name: user.name,
             token: generateToken(user)
         });
     } catch (err) {
@@ -56,7 +56,7 @@ module.exports.login = async (req, res) => {
 
         res.json({
             _id: user._id,
-            name: user.first_name,
+            name: user.name,
             token: generateToken(user)
         });
     } catch (err) {

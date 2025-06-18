@@ -1,6 +1,6 @@
 require('dotenv').config();
 const axios = require("axios");
-const User = require('../../models/users');
+const User = require('../../models/google_user');
 const jwt = require('jsonwebtoken');
 const qs = require('querystring');
 
@@ -66,7 +66,7 @@ module.exports.callback = async (req, res) => {
         if (!user) {
             user = await User.create({
                 googleId: id,
-                first_name: name,
+                name: name,
                 infoContact: email,
                 avatar: picture,
             });
