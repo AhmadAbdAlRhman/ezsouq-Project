@@ -68,7 +68,6 @@ module.exports.callback = async (req, res) => {
             });
         }
 
-        // 4. Generate JWT token
         const token = jwt.sign({
             id: user._id
         }, process.env.JWT_SECRET, {

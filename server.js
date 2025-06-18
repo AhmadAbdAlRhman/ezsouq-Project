@@ -1,8 +1,9 @@
 const express = require('express');
-require('./models/linking');
 const app = express();
-const auth = require("./routes/Auth");
-app.use(auth);
+app.use(express.json());
+require('./models/linking');
+const auth = require("./routes/Authintication");
+app.use("/api/auth", auth);
 app.listen(3010, () => {
     console.log(`🚀 Server listening on http://localhost:3010`);
 })
