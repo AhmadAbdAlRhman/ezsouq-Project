@@ -3,6 +3,11 @@ const axios = require("axios");
 const User = require('../../models/users');
 const jwt = require('jsonwebtoken');
 const qs = require('querystring');
+
+const {
+    generateToken
+} = require("../../functions/jwt");
+
 module.exports.login = (_req, res) => {
     const redirectUri = encodeURIComponent(process.env.GOOGLE_REDIRECT_URI);
     const scope = encodeURIComponent('profile email');
@@ -17,7 +22,6 @@ module.exports.login = (_req, res) => {
 
 
 module.exports.callback = async (req, res) => {
-    console.log(req.query.code);
     const code = req.query.code;
     try {
         // 1. Exchange code for access token
@@ -68,11 +72,7 @@ module.exports.callback = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({
-            id: user._id
-        }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
-        });
+        const token = generateToken(user);
 
         // 5. Send token as cookie
         res.cookie('token', token, {
