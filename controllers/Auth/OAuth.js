@@ -7,7 +7,7 @@ const qs = require('querystring');
 const {
     generateToken
 } = require("../../functions/jwt");
-
+//This is for appears all account in your device
 module.exports.login = (_req, res) => {
     const redirectUri = encodeURIComponent(process.env.GOOGLE_REDIRECT_URI);
     const scope = encodeURIComponent('profile email');
@@ -19,8 +19,7 @@ module.exports.login = (_req, res) => {
         `&scope=${scope}`;
     res.redirect(url);
 }
-
-
+//This is for login and register by Google
 module.exports.callback = async (req, res) => {
     const code = req.query.code;
     try {
@@ -86,11 +85,11 @@ module.exports.callback = async (req, res) => {
     }
 }
 
-module.exports.getProfile = async (req, res) => {
-    const user = await User.findBYId(req.body.userid);
-    if (!user)
-        return res.status(404).json({
-            message: 'User not found'
-        });
-    res.json(user);
-}
+// module.exports.getProfile = async (req, res) => {
+//     const user = await User.findBYId(req.body.userid);
+//     if (!user)
+//         return res.status(404).json({
+//             message: 'User not found'
+//         });
+//     res.json(user);
+// }

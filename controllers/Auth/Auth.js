@@ -1,11 +1,11 @@
 const User = require("../../models/email_user");
+const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const {
     generateToken
 } = require("../../functions/jwt");
 
-// Register
 module.exports.register = async (req, res) => {
     try {
         console.log(req.body);
@@ -37,7 +37,6 @@ module.exports.register = async (req, res) => {
     }
 };
 
-// Login
 module.exports.login = async (req, res) => {
     try {
         const {
@@ -66,3 +65,20 @@ module.exports.login = async (req, res) => {
         });
     }
 };
+
+module.exports.logout = async (req, res) => {
+    const token = req.headers.authorization ?.split(" ")[1];
+    if (!token)
+        return rs.status(400).json({
+            message: "Token required"
+        });
+    const decoded = jwt.decode(token);
+    const expiration = new Date(decoded.exp * 1000);
+    await BlacklistToken.create({
+        token,
+        expiredAt: expiration
+    });
+    return res.status(200).json({
+        message: "Logged out successfully"
+    }); 
+}
