@@ -23,7 +23,6 @@ module.exports.login = (_req, res) => {
 module.exports.callback = async (req, res) => {
     const code = req.query.code;
     try {
-        // 1. Exchange code for access token
         const tokenRes = await axios.post(
             'https://oauth2.googleapis.com/token',
             qs.stringify({
@@ -42,7 +41,6 @@ module.exports.callback = async (req, res) => {
             access_token
         } = tokenRes.data;
 
-        // 2. Get user info
         const userRes = await axios.get(
             'https://www.googleapis.com/oauth2/v2/userinfo', {
                 headers: {
@@ -58,7 +56,6 @@ module.exports.callback = async (req, res) => {
             picture
         } = userRes.data;
 
-        // 3. Store or update user in MongoDB
         let user = await User.findOne({
             googleId: id
         });
@@ -72,21 +69,24 @@ module.exports.callback = async (req, res) => {
         }
 
         const token = generateToken(user);
-
-        // 5. Send token as cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false, // set to true with HTTPS in production
+        res.json({
+            message: "Authenticated with Google",
+            token,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.infoContact,
+                avatar: user.avatar
+            }
         });
-        res.send(`It's Done`);
     } catch (err) {
-        console.error('OAuth Error:', err.response ?.data || err.message);
+        console.error('OAuth Error:', err?.response?.data || err.message);
         res.status(500).send('Authentication failed');
     }
 }
 
 // module.exports.getProfile = async (req, res) => {
-//     const user = await User.findBYId(req.body.userid);
+//     const user = await User.findById(req.body.userid);
 //     if (!user)
 //         return res.status(404).json({
 //             message: 'User not found'

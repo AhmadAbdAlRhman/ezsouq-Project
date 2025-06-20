@@ -15,6 +15,7 @@ router.post('/logout', Auth.logout);
 router.post("/request-code", reset.requestResetCode);
 router.post("/check_code", reset.checkCode);
 router.post("/reset_password", reset.changePassword);
+
 router.post("/send_reset_link", reset.sendResetLink);
 router.post("/change_password_link", reset.changePasswordLink);
 module.exports = router;
