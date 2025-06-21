@@ -6,11 +6,11 @@ const ProductsSchema = new mongoose.Schema({
         ref: 'categories',
         required: true,
     },
+    //just for mobile and car
     name: {
         type: String,
-        required: true
+        required: false,
     },
-    shape: String,
     Owner_id: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -21,15 +21,14 @@ const ProductsSchema = new mongoose.Schema({
         ref: 'Governorates',
         required: true,
     },
-    year_of_manufacture: Number,
-    mileage: Number,
-    engine_type: String,
+    city: {
+        type: String,
+        required: true,
+    },
     main_photo: {
         type: String,
         required: true,
     },
-    photos: [String],
-    color: String,
     description: {
         type: String,
         required: true,
@@ -38,20 +37,41 @@ const ProductsSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    fuel: String,
+    //for cars and mobiles and real_state
+    color: String,
     isnew: Boolean,
+    photos: [String],
+    //for cars
+    shape: {
+        type: String,
+        enum: [
+            'سرفيس',
+            'فان',
+            'تكسي',
+            'سباق',
+            'سوزوكي',
+            'جبلي',
+        ]
+    },
     real_estate_type: {
         type: String,
         enum: [
-            'Apartment',
-            'Office',
-            'Land'
+            'شقة',
+            'مكتب',
+            'أرض',
+            'عيادة أسنان',
+            'فيلة',
+            'شاليه'
         ]
     },
-    real_estate_size: Number,
+    for_sale: Boolean,
+    //مفروش ولا لا
+    in_Furniture: Boolean,
+    //for mobile
     processor: String,
     Sotarge: Number,
-    RAM: Number,
-}, { timestamps: true });
+}, {
+    timestamps: true
+});
 const Products = mongoose.model("Products", ProductsSchema);
 module.exports = Products;
