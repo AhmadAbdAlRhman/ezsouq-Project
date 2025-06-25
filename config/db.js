@@ -9,7 +9,7 @@ const connectDB = async () => {
         console.log('MongoDB Connected....');
     } catch (err) {
         console.log("The connection is refused: " + err.message);
-        process.exist(1);
+        process.exit(1);
     }
 }
 
