@@ -7,7 +7,6 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: '*'
 }));
-// app.options('*', cors());
 app.use(express.json());
 app.use(bodyParser.json());
 require('./models/linking');
