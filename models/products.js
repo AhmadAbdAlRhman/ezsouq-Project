@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const ProductsSchema = new mongoose.Schema({
     Category_id: {
         type: Schema.Types.ObjectId,
-        ref: 'categories',
+        ref: 'category',
         required: true,
     },
     //just for mobile and car
@@ -13,7 +13,7 @@ const ProductsSchema = new mongoose.Schema({
     },
     Owner_id: {
         type: Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'Users',
         required: true,
     },
     Governorates_id: {
@@ -37,8 +37,8 @@ const ProductsSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    //for cars and mobiles and real_state
     color: String,
+    //for cars and mobiles and real_state
     isnew: Boolean,
     photos: [String],
     //for cars

@@ -1,5 +1,4 @@
 const Governorates = require('../../models/Governorates');
-
 module.exports.getAllgovernorates = async (req, res) => {
     await Governorates.find().then((governorates) => {
         if (!governorates)
@@ -30,3 +29,4 @@ module.exports.getAllCities = async (req, res) => {
         });
     })
 }
+

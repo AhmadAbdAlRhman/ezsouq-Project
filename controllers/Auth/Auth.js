@@ -8,17 +8,15 @@ const {
 
 module.exports.register = async (req, res) => {
     try {
-        console.log(req.body);
         const name = req.body.name;
         const infoContact = req.body.infoContact;
         const password = req.body.password;
         const exists = await User.findOne({
             infoContact
         });
-        if (exists) return res.status(400).json({
-            message: "User already exists"
+        if (exists) return res.status(409).json({
+            message: "هذا الإيمل / رقم الهاتف مستخدم من قبل"
         });
-
         const user = await User.create({
             name,
             infoContact,
@@ -48,8 +46,8 @@ module.exports.login = async (req, res) => {
             infoContact
         });
         if (!user || !(await user.matchPassword(password))) {
-            return res.status(400).json({
-                message: "Invalid credentials"
+            return res.status(404).json({
+                message: "المستخدم غير مسجل من قبل"
             });
         }
 
@@ -69,8 +67,8 @@ module.exports.login = async (req, res) => {
 module.exports.logout = async (req, res) => {
     const token = req.headers.authorization ?.split(" ")[1];
     if (!token)
-        return rs.status(400).json({
-            message: "Token required"
+        return rs.status(404).json({
+            message: "الترميز غير موجود"
         });
     const decoded = jwt.decode(token);
     const expiration = new Date(decoded.exp * 1000);
