@@ -1,0 +1,20 @@
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:3010"
+    environment:
+      - DB_URL=mongodb://mongo:27017/Ezsouq_Project
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

@@ -65,18 +65,32 @@ module.exports.login = async (req, res) => {
 };
 
 module.exports.logout = async (req, res) => {
-    const token = req.headers.authorization ?.split(" ")[1];
-    if (!token)
-        return rs.status(404).json({
-            message: "الترميز غير موجود"
+    try {
+        const authHeader = req.headers.authorization;
+
+        // التحقق من وجود التوكن
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(404).json({ message: "الترميز غير موجود أو غير صالح" });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.decode(token);
+        if (!decoded || !decoded.exp) {
+            return res.status(400).json({ message: "الترميز غير صالح" });
+        }
+
+        const expiration = new Date(decoded.exp * 1000);
+
+        await BlacklistToken.create({
+            token,
+            expiredAt: expiration
         });
-    const decoded = jwt.decode(token);
-    const expiration = new Date(decoded.exp * 1000);
-    await BlacklistToken.create({
-        token,
-        expiredAt: expiration
-    });
-    return res.status(200).json({
-        message: "Logged out successfully"
-    }); 
+
+        return res.status(200).json({ message: "تم تسجيل الخروج بنجاح" });
+
+    } catch (error) {
+        console.error("Logout Error:", error);
+        return res.status(500).json({ message: "حدث خطأ أثناء تسجيل الخروج" });
+    }
 }
