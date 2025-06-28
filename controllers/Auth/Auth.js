@@ -20,11 +20,13 @@ module.exports.register = async (req, res) => {
         const user = await User.create({
             name,
             infoContact,
-            password
+            password,
+            Role: 'مستخدم عادي'
         });
         res.status(201).json({
             _id: user._id,
             name: user.name,
+            Role: user.Role,
             token: generateToken(user)
         });
     } catch (err) {
@@ -54,6 +56,7 @@ module.exports.login = async (req, res) => {
         res.json({
             _id: user._id,
             name: user.name,
+            Role: user.Role,
             token: generateToken(user)
         });
     } catch (err) {
@@ -70,14 +73,18 @@ module.exports.logout = async (req, res) => {
 
         // التحقق من وجود التوكن
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(404).json({ message: "الترميز غير موجود أو غير صالح" });
+            return res.status(404).json({
+                message: "الترميز غير موجود أو غير صالح"
+            });
         }
 
         const token = authHeader.split(" ")[1];
 
         const decoded = jwt.decode(token);
         if (!decoded || !decoded.exp) {
-            return res.status(400).json({ message: "الترميز غير صالح" });
+            return res.status(400).json({
+                message: "الترميز غير صالح"
+            });
         }
 
         const expiration = new Date(decoded.exp * 1000);
@@ -87,10 +94,14 @@ module.exports.logout = async (req, res) => {
             expiredAt: expiration
         });
 
-        return res.status(200).json({ message: "تم تسجيل الخروج بنجاح" });
+        return res.status(200).json({
+            message: "تم تسجيل الخروج بنجاح"
+        });
 
     } catch (error) {
         console.error("Logout Error:", error);
-        return res.status(500).json({ message: "حدث خطأ أثناء تسجيل الخروج" });
+        return res.status(500).json({
+            message: "حدث خطأ أثناء تسجيل الخروج"
+        });
     }
 }
