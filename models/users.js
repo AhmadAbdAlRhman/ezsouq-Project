@@ -22,12 +22,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    Role:{
+    Role: {
         type: String,
         required: true,
         enum: [
-            'مدير',
-            'مستخدم',
+            'ADMIN',
+            'USER',
         ]
     }
 }, options);
