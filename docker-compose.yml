@@ -1,20 +1,23 @@
-
 services:
+  mongo:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret123
+    volumes:
+      - mongo-data:/data/db
+
   app:
     build: .
     ports:
-      - "80:3010"
+      - "3010:3010"
     environment:
-      - DB_URL=mongodb://mongo:27017/Ezsouq_Project
+      - DB_URL=mongodb://mongoadmin:admin123admin@mongo:27017/Ezsouq_Project?authSource=admin
     depends_on:
       - mongo
-
-  mongo:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
 
 volumes:
   mongo-data:

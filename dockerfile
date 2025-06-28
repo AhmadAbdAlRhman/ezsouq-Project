@@ -1,5 +1,5 @@
 # استخدم صورة Node الرسمية
-FROM node:22
+FROM node:20
 
 # إعداد مجلد العمل داخل الحاوية
 WORKDIR /app

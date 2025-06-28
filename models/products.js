@@ -6,11 +6,6 @@ const ProductsSchema = new mongoose.Schema({
         ref: 'category',
         required: true,
     },
-    //just for mobile and car
-    name: {
-        type: String,
-        required: false,
-    },
     Owner_id: {
         type: Schema.Types.ObjectId,
         ref: 'Users',
@@ -36,6 +31,11 @@ const ProductsSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
+    },
+    //just for mobile and car
+    name: {
+        type: String,
+        required: false,
     },
     color: String,
     //for cars and mobiles and real_state
