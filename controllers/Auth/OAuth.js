@@ -22,13 +22,11 @@ module.exports.login = (_req, res) => {
 //This is for login and register by Google
 module.exports.callback = async (req, res) => {
     const code = req.query.code;
-
     if (!code) {
         return res.status(400).json({
             error: 'Missing "code" in query params'
         });
     }
-
     try {
         const tokenRes = await axios.post(
             'https://oauth2.googleapis.com/token',
@@ -44,11 +42,9 @@ module.exports.callback = async (req, res) => {
                 },
             }
         );
-
         const {
             access_token
         } = tokenRes.data;
-
         const userRes = await axios.get(
             'https://www.googleapis.com/oauth2/v2/userinfo', {
                 headers: {
@@ -56,15 +52,12 @@ module.exports.callback = async (req, res) => {
                 },
             }
         );
-
         const {
             id,
             name,
             email,
             picture
         } = userRes.data;
-
-        // ✅ البحث باستخدام googleId أو الإيميل
         let user = await User.findOne({
             $or: [{
                     googleId: id
@@ -74,7 +67,6 @@ module.exports.callback = async (req, res) => {
                 }
             ]
         });
-
         if (!user) {
             user = await User.create({
                 googleId: id,
@@ -84,27 +76,22 @@ module.exports.callback = async (req, res) => {
                 Role: 'USER'
             });
         } else {
-            res.status(400).json({
-                message: "الإيميل مسجل من قبل عن طريق كلمة المرور"
+            const token = generateToken(user);
+            res.json({
+                message: "تمت المصادقة عن طريق ال جوجل",
+                token,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.infoContact,
+                    avatar: user.avatar
+                }
             });
         }
-
-        const token = generateToken(user);
-
-        res.json({
-            message: "تمت المصادقة عن طريق ال جوجل",
-            token,
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.infoContact,
-                avatar: user.avatar
-            }
-        });
-
     } catch (err) {
         console.error('OAuth Error:', err ?.response ?.data || err.message);
-        res.status(500).json({ error: 'فشلت المصادقة مع Google' });
+        res.status(500).json({
+            error: 'فشلت المصادقة مع Google'
+        });
     }
 };
-

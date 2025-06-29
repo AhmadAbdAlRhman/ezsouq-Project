@@ -28,6 +28,7 @@ const UserSchema = new mongoose.Schema({
         enum: [
             'ADMIN',
             'USER',
+            'OWNER'
         ]
     }
 }, options);
