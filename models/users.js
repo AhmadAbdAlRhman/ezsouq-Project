@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    infoContact: {
+    email: {
         type: String,
         required: false,
         unique: true,

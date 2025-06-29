@@ -3,9 +3,9 @@ const User = require("../../models/email_user");
 const nodemailer = require("nodemailer");
 //This is for send Code to Email for mobile
 module.exports.requestResetCode = async (req, res) => {
-    const infoContact = req.body.infoContact;
+    const email = req.body.email;
     await User.findOne({
-        infoContact
+        email
     }).then(async (user) => {
         if (!user)
             return res.status(404).json({
@@ -24,7 +24,7 @@ module.exports.requestResetCode = async (req, res) => {
         });
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: user.infoContact,
+            to: user.email,
             subject: "Your Password Reset Code",
             text: `Your reset code is: ${code}`
         });
@@ -79,9 +79,9 @@ module.exports.changePassword = async (req, res) => {
 }
 //THis is to send email with token to user for website
 module.exports.sendResetLink = async (req, res) => {
-    const infoContact = req.body.infoContact;
+    const email = req.body.email;
     await User.findOne({
-        infoContact
+        email
     }).then(async (user) => {
         if (!user)
             return res.status(404).json({
@@ -101,7 +101,7 @@ module.exports.sendResetLink = async (req, res) => {
         });
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: infoContact,
+            to: email,
             subject: "Password Reset",
             html: `
         <p>Click on the person who has his hand raised to reset your password:</p>

@@ -63,7 +63,7 @@ module.exports.callback = async (req, res) => {
                     googleId: id
                 },
                 {
-                    infoContact: email
+                    email: email
                 }
             ]
         });
@@ -71,7 +71,7 @@ module.exports.callback = async (req, res) => {
             user = await User.create({
                 googleId: id,
                 name: name,
-                infoContact: email,
+                email: email,
                 avatar: picture,
                 Role: 'USER'
             });
@@ -83,7 +83,7 @@ module.exports.callback = async (req, res) => {
                 user: {
                     _id: user._id,
                     name: user.name,
-                    email: user.infoContact,
+                    email: user.email,
                     avatar: user.avatar
                 }
             });

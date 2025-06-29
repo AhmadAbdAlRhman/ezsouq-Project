@@ -9,17 +9,17 @@ const {
 module.exports.register = async (req, res) => {
     try {
         const name = req.body.name;
-        const infoContact = req.body.infoContact;
+        const email = req.body.email;
         const password = req.body.password;
         const exists = await User.findOne({
-            infoContact
+            email
         });
         if (exists) return res.status(409).json({
             message: "هذا الإيمل / رقم الهاتف مستخدم من قبل"
         });
         const user = await User.create({
             name,
-            infoContact,
+            email,
             password,
             Role: 'مستخدم عادي'
         });
@@ -41,12 +41,12 @@ module.exports.register = async (req, res) => {
 module.exports.login = async (req, res) => {
     try {
         const {
-            infoContact,
+            email,
             password
         } = req.body;
 
         const user = await User.findOne({
-            infoContact
+            email
         });
         if (!user || !(await user.matchPassword(password))) {
             return res.status(404).json({
