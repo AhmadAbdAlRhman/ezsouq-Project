@@ -24,6 +24,7 @@ module.exports.register = async (req, res) => {
             Role: 'مستخدم عادي'
         });
         res.status(201).json({
+            message: "تم إنشاء المستخدم بنجاح",
             _id: user._id,
             name: user.name,
             Role: user.Role,
@@ -54,6 +55,7 @@ module.exports.login = async (req, res) => {
         }
 
         res.json({
+            message: "تم تسجيل الدخول بنجاح",
             _id: user._id,
             name: user.name,
             Role: user.Role,

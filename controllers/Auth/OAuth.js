@@ -22,6 +22,13 @@ module.exports.login = (_req, res) => {
 //This is for login and register by Google
 module.exports.callback = async (req, res) => {
     const code = req.query.code;
+
+    if (!code) {
+        return res.status(400).json({
+            error: 'Missing "code" in query params'
+        });
+    }
+
     try {
         const tokenRes = await axios.post(
             'https://oauth2.googleapis.com/token',
@@ -35,7 +42,8 @@ module.exports.callback = async (req, res) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            });
+            }
+        );
 
         const {
             access_token
@@ -56,21 +64,35 @@ module.exports.callback = async (req, res) => {
             picture
         } = userRes.data;
 
+        // ✅ البحث باستخدام googleId أو الإيميل
         let user = await User.findOne({
-            googleId: id
+            $or: [{
+                    googleId: id
+                },
+                {
+                    infoContact: email
+                }
+            ]
         });
+
         if (!user) {
             user = await User.create({
                 googleId: id,
                 name: name,
                 infoContact: email,
                 avatar: picture,
+                Role: 'USER'
+            });
+        } else {
+            res.status(400).json({
+                message: "الإيميل مسجل من قبل عن طريق كلمة المرور"
             });
         }
 
         const token = generateToken(user);
+
         res.json({
-            message: "Authenticated with Google",
+            message: "تمت المصادقة عن طريق ال جوجل",
             token,
             user: {
                 _id: user._id,
@@ -79,17 +101,10 @@ module.exports.callback = async (req, res) => {
                 avatar: user.avatar
             }
         });
-    } catch (err) {
-        console.error('OAuth Error:', err?.response?.data || err.message);
-        res.status(500).send('Authentication failed');
-    }
-}
 
-// module.exports.getProfile = async (req, res) => {
-//     const user = await User.findById(req.body.userid);
-//     if (!user)
-//         return res.status(404).json({
-//             message: 'User not found'
-//         });
-//     res.json(user);
-// }
+    } catch (err) {
+        console.error('OAuth Error:', err ?.response ?.data || err.message);
+        res.status(500).json({ error: 'فشلت المصادقة مع Google' });
+    }
+};
+
