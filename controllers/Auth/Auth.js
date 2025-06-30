@@ -1,6 +1,8 @@
 const User = require("../../models/email_user");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
+const {registerSchema} = require("../../validation/user");
+const {loginSchema} = require("../../validation/user");
 require('dotenv').config();
 const {
     generateToken
@@ -15,13 +17,12 @@ module.exports.register = async (req, res) => {
             email
         });
         if (exists) return res.status(409).json({
-            message: "هذا الإيمل / رقم الهاتف مستخدم من قبل"
+            message: "هذا الإيمل مستخدم من قبل"
         });
+        const validatedData = await registerSchema.validateAsync(req.body);
         const user = await User.create({
-            name,
-            email,
-            password,
-            Role: 'مستخدم عادي'
+            ...validatedData,
+            Role: 'USER'
         });
         res.status(201).json({
             message: "تم إنشاء المستخدم بنجاح",
@@ -40,11 +41,8 @@ module.exports.register = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
-        const {
-            email,
-            password
-        } = req.body;
-
+        const validatedData = await loginSchema.validateAsync(req.body);
+        const {email, password} = validatedData;
         const user = await User.findOne({
             email
         });
