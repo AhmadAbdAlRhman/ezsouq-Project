@@ -95,4 +95,62 @@ module.exports.getFilteredProducts = async (req, res) => {
     }
 }
 
-// mod
+module.exports.addProduct = async (req, res) => {
+    try {
+        const Owner_id = req.query.owner_id;
+        const {
+            name,
+            Category_id,
+            Governorate_name,
+            city,
+            description,
+            price,
+            color,
+            isnew,
+            shape,
+            real_estate_type,
+            for_sale,
+            is_Furniture,
+            processor,
+            storage
+        } = req.body;
+        const mainPhotos = req.files['main_photos'] ?.map(file => file.filename) || [];
+        const optionalPhotos = req.files['photos'] ?.map(file => file.filename) || [];
+        const video = req.files['video'] ?.[0] ?.filename || null ;
+        if (mainPhotos.length !== 3) {
+            return res.status(400).json({
+                message: 'يجب رفع 3 صور أساسية تماماً.',
+                current_count: mainPhotos.length
+            });
+        }
+        const new_product = await Products.create({
+            Owner_id,
+            name,
+            Category_id,
+            Governorate_name,
+            city,
+            main_photos: mainPhotos,
+            description,
+            price,
+            video,
+            photos: optionalPhotos,
+            color,
+            isnew,
+            shape,
+            real_estate_type,
+            for_sale,
+            is_Furniture,
+            processor,
+            storage
+        });
+        res.status(201).json({
+            message: "تمت إضافة العرض بنجاح",
+            product: new_product
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "حدث خطأ أثناء إضافة المنتج",
+            error: err.message
+        })
+    }
+}

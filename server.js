@@ -9,6 +9,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(bodyParser.json());
+app.use('uploads/images', express.static('uploads/images'));
+app.use('uploads/videos', express.static('uploads/videos'));
 require('./models/linking');
 const auth = require("./routes/Authintication");
 const user = require("./routes/user");

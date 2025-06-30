@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ProductsSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
     Category_id: {
         type: Schema.Types.ObjectId,
         ref: 'category',
@@ -11,8 +15,8 @@ const ProductsSchema = new mongoose.Schema({
         ref: 'Users',
         required: true,
     },
-    Governorates_id: {
-        type: Schema.Types.ObjectId,
+    Governorate_name: {
+        type: String,
         ref: 'Governorates',
         required: true,
     },
@@ -20,8 +24,8 @@ const ProductsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    main_photo: {
-        type: String,
+    main_photos: {
+        type: [String],
         required: true,
     },
     description: {
@@ -32,15 +36,21 @@ const ProductsSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    video: String,
     //just for mobile and car
-    name: {
-        type: String,
-        required: false,
-    },
     color: String,
     //for cars and mobiles and real_state
     isnew: Boolean,
-    photos: [String],
+    photos: {
+        type: [String],
+        validate: {
+            validator: function (arr) {
+                return arr.length <= 2;
+            },
+            message: 'يمكنك رفع حتى صورتين إضافيتين فقط.'
+        },
+        default: []
+    },
     //for cars
     shape: {
         type: String,
