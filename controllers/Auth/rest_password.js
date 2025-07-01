@@ -9,7 +9,7 @@ module.exports.requestResetCode = async (req, res) => {
     }).then(async (user) => {
         if (!user)
             return res.status(404).json({
-                message: "User not found"
+                message: "الإيميل غير موجود ب قاعدة البيانات"
             });
         const code = Math.floor(10000 + Math.random() * 90000).toString();
         user.resetToken = code;
@@ -25,11 +25,11 @@ module.exports.requestResetCode = async (req, res) => {
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: user.email,
-            subject: "Your Password Reset Code",
-            text: `Your reset code is: ${code}`
+            subject: "كود لتهائية كلمة المرور",
+            text: `الكود هو : ${code}`
         });
-        res.json({
-            message: "Reset code sent to email"
+        res.status(200).json({
+            message: "تم إرسال الكود ل الإيميل"
         });
     })
 };
@@ -44,14 +44,14 @@ module.exports.checkCode = async (req, res) => {
     }).then(async (user) => {
         if (!user)
             return res.status(400).json({
-                message: "Invalid or expired code"
+                message: "الكود غير صحيح/ تأخرت في إدخال الكود"
             });
         res.status(200).json({
-            message: "code is true"
+            message: "الكود صحيح"
         });
     }).catch((err) => {
         res.status(400).json({
-            message: `Invalid or expired code => ${err.message}`
+            message: `خطأ في إدخال الكود => ${err.message}`
         });
     })
 }
@@ -63,15 +63,15 @@ module.exports.changePassword = async (req, res) => {
         _id: id
     }).then(async (user) => {
         if (!user)
-            return res.status(400).json({
-                message: "NotFound User"
+            return res.status(404).json({
+                message: "المستخدم غير موجود"
             });
         user.password = newPassword;
         user.resetToken = undefined;
         user.resetTokenExpire = undefined;
         await user.save();
         res.status(200).json({
-            message: "The password is changed safely"
+            message: "تم تغير كلمة المرور بنجاح"
         });
     }).catch((err) => {
         res.status(400).json(err.message);
@@ -85,7 +85,7 @@ module.exports.sendResetLink = async (req, res) => {
     }).then(async (user) => {
         if (!user)
             return res.status(404).json({
-                message: "The user is not found"
+                message: "المستخدم غير موجود"
             });
         const token = crypto.randomBytes(32).toString('hex');
         user.resetToken = token;
@@ -102,15 +102,15 @@ module.exports.sendResetLink = async (req, res) => {
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
-            subject: "Password Reset",
+            subject: "إعادة تهيأة كلمة المرور",
             html: `
-        <p>Click on the person who has his hand raised to reset your password:</p>
+        <p>اضغط على الإيموجي لتغير كلمة المرور:</p>
         <a href="${token}">🙋‍♂️🙋‍♂️</a>
-        <p>This link is valid for 10 minutes.</p>
+        <p>هذا الإيميل صالح لمدة 10 دقائق فقط</p>
         `
         });
-        res.json({
-            message: "Password reset link sent to your email"
+        res.status(200).json({
+            message: "تم إرسال الرابط عن طريق الإيميل"
         });
     }).catch((err) => {
         res.status(500).json({
@@ -129,12 +129,12 @@ module.exports.changePasswordLink = async (req, res) => {
         }
     }).then(async (user)=>{
         if(!user)
-            return res.status(404).json({message:"The user not Found"});
+            return res.status(404).json({message:"المستخدم غير موجود"});
         user.password = newPassword;
         user.resetToken = undefined;
         user.resetTokenExpire = undefined;
         await user.save();
-        return res.status(200).json({message:"The Password is changed safely"});
+        return res.status(200).json({message:"تم تغير كلمة المرور بنجاح وأمان"});
     }).catch((err) => {
         console.log(err.message);
         return res.status(500).json({message: `${err.message}`});

@@ -3,7 +3,8 @@ const router = express.Router();
 const governorates = require('../controllers/user/Governorates');
 const products = require('../controllers/user/products');
 const upload = require('../middleware/upload_files');
-
+const protect = require('../middleware/OAtuh');
+const checkRole = require('../middleware/checkRole');
 
 router.get('/governorates', governorates.getAllgovernorates);
 router.get('/cities', governorates.getAllCities);
@@ -13,17 +14,12 @@ router.get('/sortedProducts', products.getAllSortedProducts);
 router.get('/fliteredProducts', products.getFilteredProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
-    upload.fields([{
-            name: 'main_photos',
-            maxCount: 3
-        },
-        {
-            name: 'photos',
-            maxCount: 2
-        },
-        {
-            name: 'video',
-            maxCount: 1
-        }
-    ]), products.addProduct);
-module.exports = router;    
+    protect,
+    checkRole(['ADMIN','OWNER']),
+    upload.fields([
+        {name: 'main_photos', maxCount: 3},
+        {name: 'photos', maxCount: 2},
+        {name: 'video', maxCount: 1}
+    ]),
+    products.addProduct);
+module.exports = router;
