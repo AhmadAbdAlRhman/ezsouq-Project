@@ -1,5 +1,6 @@
 const Governorates = require('../../models/Governorates');
 module.exports.addGovernorates = async (req, res) => {
+    console.log(req.body);
     const name = req.body.name;
     const cities = req.body.cities;
     if (!name)
