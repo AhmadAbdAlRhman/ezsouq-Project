@@ -105,7 +105,7 @@ module.exports.sendResetLink = async (req, res) => {
             subject: "إعادة تهيأة كلمة المرور",
             html: `
         <p>اضغط على الإيموجي لتغير كلمة المرور:</p>
-        <a href="${token}">🙋‍♂️🙋‍♂️</a>
+        <a href="${resetLink}">🙋‍♂️🙋‍♂️</a>
         <p>هذا الإيميل صالح لمدة 10 دقائق فقط</p>
         `
         });

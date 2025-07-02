@@ -52,6 +52,13 @@ const ProductsSchema = new mongoose.Schema({
         default: []
     },
     //for cars
+    engine_type:{
+        type:String,
+        enum:[
+            'اتوماتيك',
+            'غيير عادي'
+        ]
+    },
     shape: {
         type: String,
         enum: [

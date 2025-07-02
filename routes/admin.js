@@ -3,6 +3,7 @@ const router = express.Router();
 const checkRole = require('../middleware/checkRole');
 const protect = require('../middleware/OAtuh');
 const Governorates = require('../controllers/admin/Governorates');
+const Users = require('../controllers/admin/users');
 
 router.post('/add_governorates',
     protect,
@@ -14,4 +15,8 @@ router.put('/update_governorate/:gov_id',
     checkRole(['ADMIN', 'OWNER']),
     Governorates.updateGovernorate
 );
+router.put('/Granting_permissions', 
+    protect,
+    checkRole(['OWNER']),
+    Users.GrantingPermissions);
 module.exports = router;

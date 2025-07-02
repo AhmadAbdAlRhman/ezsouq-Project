@@ -24,8 +24,11 @@ module.exports.getAllSortedProducts = async (req, res) => {
         const total = await Products.countDocuments();
         await Products.find()
             .populate('Category_id')
-            .populate('Owner_id')
-            .populate('Governorates_id')
+            .populate({
+                path: 'Owner_id',
+                select: '-password' // ✅ هذا السطر يخفي كلمة المرور
+            })
+            // .populate('Governorates_id')
             .sort({
                 [sortField]: order
             })
@@ -116,7 +119,7 @@ module.exports.addProduct = async (req, res) => {
         } = req.body;
         const mainPhotos = req.files['main_photos'] ?.map(file => file.filename) || [];
         const optionalPhotos = req.files['photos'] ?.map(file => file.filename) || [];
-        const video = req.files['video'] ?.[0] ?.filename || null ;
+        const video = req.files['video'] ?. [0] ?.filename || null;
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
@@ -154,4 +157,3 @@ module.exports.addProduct = async (req, res) => {
         })
     }
 }
-
