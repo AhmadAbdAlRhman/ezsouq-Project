@@ -1,6 +1,5 @@
 const Governorates = require('../../models/Governorates');
 module.exports.addGovernorates = async (req, res) => {
-    console.log(req.body);
     const name = req.body.name;
     const cities = req.body.cities;
     if (!name)
@@ -32,4 +31,31 @@ module.exports.addGovernorates = async (req, res) => {
         });
     })
 
+}
+
+module.exports.updateGovernorate = async (req, res) => {
+    const gov_id = req.params.gov_id;
+    const name = req.body.name;
+    const cities = req.body.cities;
+    await Governorates.findByIdAndUpdate({
+        _id: gov_id
+    }, {
+        name,
+        cities
+    }, {
+        new: true,
+        runValidators: true
+    }).then((update) => {
+        if (!update)
+            return res.status(404).json({message:"المحافظة غير موجودة"});
+        return res.status(200).json({
+            message:"تم تحديث البيانات بنجاح",
+            governorate: update
+        });
+    }).catch((err)=>{
+        return res.status(500).json({
+            message:"حدث خطأ خلال تحديث البيانات لهذه المحافظة",
+            error: err.message
+        });
+    });
 }

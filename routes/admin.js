@@ -8,5 +8,10 @@ router.post('/add_governorates',
     protect,
     checkRole(['ADMIN','OWNER']),
     Governorates.addGovernorates);
-
+//=>update Governorates and cities which belong to it
+router.put('/update_governorate/:gov_id',
+    protect,
+    checkRole(['ADMIN', 'OWNER']),
+    Governorates.updateGovernorate
+);
 module.exports = router;
