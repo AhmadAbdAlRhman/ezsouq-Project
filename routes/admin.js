@@ -19,4 +19,8 @@ router.put('/Granting_permissions',
     protect,
     checkRole(['OWNER']),
     Users.GrantingPermissions);
+router.put('/Withdraw_permissions', 
+    protect,
+    checkRole(['OWNER']),
+    Users.WithdrawPermissions);
 module.exports = router;
