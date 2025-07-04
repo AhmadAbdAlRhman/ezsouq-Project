@@ -24,7 +24,7 @@ module.exports.addCtegory = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ في السيرفر",
-            error: error.message
+            error: err.message
         });
     }
 }

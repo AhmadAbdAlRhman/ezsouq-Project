@@ -1,5 +1,5 @@
 const Governorates = require('../../models/Governorates');
-module.exports.getAllgovernorates = async (req, res) => {
+module.exports.getAllgovernorates = async (_req, res) => {
     await Governorates.find().then((governorates) => {
         if (!governorates)
             return res.status(404).json({

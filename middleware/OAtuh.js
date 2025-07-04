@@ -4,7 +4,7 @@ require('dotenv').config();
 module.exports = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer '))
-        return res.status(40).json({
+        return res.status(404).json({
             message: "Token missing"
         });
     const token = authHeader.split(' ')[1];
@@ -16,7 +16,7 @@ module.exports = async (req, res, next) => {
             message: "Token blacklisted"
         });
     try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (err) {

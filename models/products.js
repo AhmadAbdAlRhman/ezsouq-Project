@@ -40,7 +40,11 @@ const ProductsSchema = new mongoose.Schema({
     //just for mobile and car
     color: String,
     //for cars and mobiles and real_state
-    isnew: Boolean,
+    isnew: {
+        type: Boolean,
+        required: false,
+        default: null
+    },
     photos: {
         type: [String],
         validate: {
@@ -57,7 +61,8 @@ const ProductsSchema = new mongoose.Schema({
         enum:[
             'اتوماتيك',
             'غيير عادي'
-        ]
+        ],
+        default: null
     },
     shape: {
         type: String,
@@ -68,7 +73,8 @@ const ProductsSchema = new mongoose.Schema({
             'سباق',
             'سوزوكي',
             'جبلي',
-        ]
+        ],
+        default: null
     },
     real_estate_type: {
         type: String,
@@ -79,11 +85,20 @@ const ProductsSchema = new mongoose.Schema({
             'عيادة أسنان',
             'فيلة',
             'شاليه'
-        ]
+        ],
+        default: null
     },
-    for_sale: Boolean,
+    for_sale: {
+        type: Boolean,
+        required: false,
+        default: null
+    },
     //مفروش ولا لا
-    in_Furniture: Boolean,
+    in_Furniture: {
+        type: Boolean,
+        required: false,
+        default: null
+    },
     //for mobile
     processor: String,
     Sotarge: Number,

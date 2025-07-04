@@ -48,7 +48,7 @@ module.exports.WithdrawPermissions = async (req, res) => {
         delete userObj.resetToken;
         delete userObj.resetTokenExpire;
         return res.status(200).json({
-            message: ' لهذا المستخدم Admin تمت إضافة صلاحية ال ',
+            message: ' من هذا المستخدم Admin تمت سحب صلاحية ال ',
             user: userObj
         })
     }).catch((err) => {
