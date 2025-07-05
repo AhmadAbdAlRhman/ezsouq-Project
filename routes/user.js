@@ -6,7 +6,7 @@ const upload = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 
 router.get('/governorates', governorates.getAllgovernorates);
-router.get('/cities', governorates.getAllCities);
+router.get('/cities/:name', governorates.getAllCities);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/categories', products.getAllCategories);
 router.get('/sortedProducts', products.getAllSortedProducts);
