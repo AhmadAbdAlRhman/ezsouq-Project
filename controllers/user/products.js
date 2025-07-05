@@ -1,5 +1,6 @@
 const Gategory = require('../../models/Category');
 const Products = require('../../models/products');
+const mongoose = require('mongoose');
 module.exports.getAllCategories = async (_req, res) => {
     await Gategory.find({}).then((gategory) => {
         if (!gategory)
@@ -156,4 +157,23 @@ module.exports.addProduct = async (req, res) => {
             error: err.message
         })
     }
+}
+
+module.exports.getOneProduct = async (req, res) => {
+    const pro_id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(pro_id))
+        return res.status(400).json({ message: "معرّف غير صالح" });
+    await Products.findById(
+        pro_id
+    ).then((pro) => {
+        if (!pro)
+            return res.status(404).json({message:"لا يوجد مثل هذا المنتج"});
+        return res.status(200).json(pro);
+    }).catch((err) => {
+        res.status(500)
+            .json({
+                message: "Error Server",
+                Error: err.details
+            });
+    })
 }

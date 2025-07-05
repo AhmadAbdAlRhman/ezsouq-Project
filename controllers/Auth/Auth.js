@@ -1,8 +1,12 @@
 const User = require("../../models/email_user");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
-const {registerSchema} = require("../../validation/user");
-const {loginSchema} = require("../../validation/user");
+const {
+    registerSchema
+} = require("../../validation/user");
+const {
+    loginSchema
+} = require("../../validation/user");
 require('dotenv').config();
 const {
     generateToken
@@ -42,13 +46,20 @@ module.exports.register = async (req, res) => {
 module.exports.login = async (req, res) => {
     try {
         const validatedData = await loginSchema.validateAsync(req.body);
-        const {email, password} = validatedData;
+        const {
+            email,
+            password
+        } = validatedData;
         const user = await User.findOne({
             email
         });
-        if (!user || !(await user.matchPassword(password))) {
+        if (!user) {
             return res.status(404).json({
                 message: "المستخدم غير مسجل من قبل"
+            });
+        } else if (!(await user.matchPassword(password))) {
+            return res.status(401).json({
+                message: "كلمة المرور غير صحيحة"
             });
         }
         res.json({

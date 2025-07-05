@@ -14,7 +14,7 @@ module.exports.getAllgovernorates = async (_req, res) => {
 }
 
 module.exports.getAllCities = async (req, res) => {
-    const name = req.body.name;
+    const name = req.params.name;
     await Governorates.findOne({
         name
     }).then((gov) => {
