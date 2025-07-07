@@ -14,6 +14,15 @@ const {
 
 module.exports.register = async (req, res) => {
     try {
+        const {
+            error
+        } = registerSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                status: 'fail',
+                message: error.details[0].message
+            });
+        }
         const name = req.body.name;
         const email = req.body.email;
         const password = req.body.password;
@@ -23,9 +32,10 @@ module.exports.register = async (req, res) => {
         if (exists) return res.status(409).json({
             message: "هذا الإيمل مستخدم من قبل"
         });
-        const validatedData = await registerSchema.validateAsync(req.body);
         const user = await User.create({
-            ...validatedData,
+            name,
+            email,
+            password,
             Role: 'USER'
         });
         res.status(201).json({
@@ -45,7 +55,13 @@ module.exports.register = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
-        const validatedData = await loginSchema.validateAsync(req.body);
+        const { error } = registerSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                status: 'fail',
+                message: error.details[0].message
+            });
+        }
         const {
             email,
             password
