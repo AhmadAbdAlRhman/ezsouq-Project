@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Product = require('./products');
 const options = {
     discriminatorkey: "provider",
     timestamps: true
@@ -17,6 +18,9 @@ const UserSchema = new mongoose.Schema({
     avatar: {
         type: String,
         required: false,
+    },
+    phone:{
+        type: Number
     },
     address: {
         type: String,
@@ -39,7 +43,16 @@ UserSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
-
+UserSchema.pre('remove', async function (next) {
+    try {
+        await Product.deleteMany({
+            Owner_id: this._id
+        });
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
 UserSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };

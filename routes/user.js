@@ -15,7 +15,8 @@ router.get('/fliteredProducts', products.getFilteredProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/product/:id', products.getOneProduct);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-router.get('/user/:user_id', user.getOneUser);
+router.get('/get_user/:user_id', user.getOneUser);
+router.get('/update_information/:user_id', user.updateInformationUser);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,

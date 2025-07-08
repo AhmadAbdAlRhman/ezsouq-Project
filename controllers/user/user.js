@@ -19,3 +19,8 @@ module.exports.getOneUser = async (req, res) => {
             });
     });
 }
+
+module.exports.updateInformationUser = async (req, res) => {
+
+}
+

@@ -25,10 +25,9 @@ module.exports.getAllSortedProducts = async (req, res) => {
         const total = await Products.countDocuments();
         await Products.find()
             .populate('Category_id')
-            .populate({
-                path: 'Owner_id',
-                select: '-password' // ✅ هذا السطر يخفي كلمة المرور
-            })
+            .populate(
+                'Owner_id', 'name avatar phone'
+            )
             // .populate('Governorates_id')
             .sort({
                 [sortField]: order
@@ -72,8 +71,7 @@ module.exports.getFilteredProducts = async (req, res) => {
         const order = req.query.order === 'desc' ? -1 : 1;
         await Products.find(filter)
             .populate('Category_id')
-            .populate('Owner_id')
-            .populate('Governorates_id')
+            .populate('Owner_id', 'name avatar phone')
             .sort({
                 [sortField]: order
             })
@@ -162,18 +160,56 @@ module.exports.addProduct = async (req, res) => {
 module.exports.getOneProduct = async (req, res) => {
     const pro_id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(pro_id))
-        return res.status(400).json({ message: "معرّف غير صالح" });
+        return res.status(400).json({
+            message: "معرّف غير صالح"
+        });
     await Products.findById(
-        pro_id
-    ).then((pro) => {
-        if (!pro)
-            return res.status(404).json({message:"لا يوجد مثل هذا المنتج"});
-        return res.status(200).json(pro);
-    }).catch((err) => {
-        res.status(500)
-            .json({
-                message: "Error Server",
-                Error: err.details
-            });
-    })
+            pro_id
+        ).populate('Category_id') // فقط الاسم من الفئة
+        .populate('Owner_id', 'name avatar phone')
+        .then((pro) => {
+            if (!pro)
+                return res.status(404).json({
+                    message: "لا يوجد مثل هذا المنتج"
+                });
+            return res.status(200).json(pro);
+        }).catch((err) => {
+            res.status(500)
+                .json({
+                    message: "Error Server",
+                    Error: err.details
+                });
+        })
+}
+
+module.exports.search = async (req, res) => {
+    try {
+        const keyword = req.query.keyword;
+        const filter = keyword ? {
+            $or: [{
+                    name: {
+                        $regex: keyword,
+                        $options: 'i'
+                    }
+                },
+                {
+                    description: {
+                        $regex: keyword,
+                        $options: 'i'
+                    }
+                }
+            ]
+        } : {};
+        const products = await Products.find(filter)
+            .populate('Category_id')
+            .populate('Owner_id', 'name avatar phone')
+            .exec();
+            return res.status(200).json(products);
+    } catch (err) {
+        console.error('Error during product search:', err);
+        return res.status(500).json({
+            message: 'حدث خطأ أثناء البحث عن المنتجات',
+            error: err.message,
+        });
+    }
 }
