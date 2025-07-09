@@ -65,7 +65,7 @@ module.exports.getFilteredProducts = async (req, res) => {
         if (req.query.governorates)
             filter.Governorates_id = req.query.governorates;
         if (req.query.Category)
-            filter.Category_id = req.qeury.Category;
+            filter.Category_id = req.query.Category;
         const total = await Products.countDocuments(filter);
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
