@@ -14,6 +14,7 @@ router.get('/sortedProducts', products.getAllSortedProducts);
 router.get('/fliteredProducts', products.getFilteredProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/product/:id', products.getOneProduct);
+router.get('/search_product', products.search);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
 router.get('/update_information/:user_id', user.updateInformationUser);
