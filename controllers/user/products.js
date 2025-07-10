@@ -224,7 +224,7 @@ module.exports.reportProducts = async (req, res) => {
         const userId = req.user.id;
         const newReport = new Report({
             product: productId,
-            reported_by: userId,
+            reported_By: userId,
             reason,
             message
         });

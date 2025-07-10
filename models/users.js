@@ -22,9 +22,17 @@ const UserSchema = new mongoose.Schema({
     phone:{
         type: Number
     },
-    address: {
+    Location: {
         type: String,
         required: false,
+    },
+    workplace: {
+        type: String,
+        required: false,
+    },
+    work_type:{
+        type: String,
+        required:false
     },
     Role: {
         type: String,

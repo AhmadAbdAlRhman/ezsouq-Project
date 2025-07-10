@@ -55,7 +55,7 @@ module.exports.register = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
-        const { error } = registerSchema.validate(req.body);
+        const { error } = loginSchema.validate(req.body);
         if (error) {
             return res.status(400).json({
                 status: 'fail',
@@ -65,7 +65,7 @@ module.exports.login = async (req, res) => {
         const {
             email,
             password
-        } = validatedData;
+        } = req.body;
         const user = await User.findOne({
             email
         });
