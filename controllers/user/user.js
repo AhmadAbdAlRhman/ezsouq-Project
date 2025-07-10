@@ -22,7 +22,7 @@ module.exports.getOneUser = async (req, res) => {
 
 module.exports.updateInformationUser = async (req, res) => {
     try {
-        const userId = req.params.user_id;
+        const userId = req.user.id;
 
         const updates = {
             name: req.body.name,
