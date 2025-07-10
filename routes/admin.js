@@ -38,8 +38,8 @@ router.post('/add_category',
     products.addCtegory);
 //عرض التقراير
 router.get('/reports',
-    // protect,
-    // checkRole(['ADMIN', 'OWNER']),
+    protect,
+    checkRole(['ADMIN', 'OWNER']),
     products.getAllReports
 );
 module.exports = router;
