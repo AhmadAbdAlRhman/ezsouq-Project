@@ -42,6 +42,10 @@ const UserSchema = new mongoose.Schema({
             'ADMIN',
             'OWNER'
         ]
+    },
+    whats_app:{
+        type: Number,
+        required: false
     }
 }, options);
 
