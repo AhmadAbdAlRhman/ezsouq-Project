@@ -21,6 +21,41 @@ module.exports.getOneUser = async (req, res) => {
 }
 
 module.exports.updateInformationUser = async (req, res) => {
+    try {
+        const userId = req.params.user_id;
 
+        const updates = {
+            name: req.body.name,
+            avatar: req.body.avatar,
+            phone: req.body.phone,
+            Location: req.body.Location,
+            workplace: req.body.workplace,
+            work_type: req.body.work_type,
+            whats_app: req.body.whats_app
+        };
+
+        Object.keys(updates).forEach(key => updates[key] === undefined && delete updates[key]);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updates },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'المستخدم غير موجود' });
+        }
+
+        return res.status(200).json({
+            message: 'تم تحديث بيانات المستخدم بنجاح',
+            user: updatedUser
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'حدث خطأ أثناء تحديث البيانات',
+            error: err.message
+        });
+    }
 }
 
