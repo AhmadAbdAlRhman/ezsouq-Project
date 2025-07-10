@@ -63,7 +63,7 @@ module.exports.getFilteredProducts = async (req, res) => {
         if (req.query.city)
             filter.city = req.query.city;
         if (req.query.governorates)
-            filter.Governorates_name = req.query.governorates;
+            filter.Governorate_name = req.query.governorates;
         if (req.query.Category)
             filter.Category_name = req.query.Category;
         const total = await Products.countDocuments(filter);
