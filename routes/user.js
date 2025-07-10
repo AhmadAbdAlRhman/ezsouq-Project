@@ -20,7 +20,7 @@ router.get('/get_user/:user_id', user.getOneUser);
 router.get('/update_information/:user_id', user.updateInformationUser);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
-    protect,
+    // protect,
     upload.fields([
         {name: 'main_photos', maxCount: 3},
         {name: 'photos', maxCount: 2},

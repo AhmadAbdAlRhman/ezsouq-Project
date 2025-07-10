@@ -114,9 +114,10 @@ module.exports.addProduct = async (req, res) => {
             processor,
             storage
         } = req.body;
-        const mainPhotos = req.files['main_photos'] ?.map(file => file.filename) || [];
-        const optionalPhotos = req.files['photos'] ?.map(file => file.filename) || [];
-        const video = req.files['video'] ?. [0] ?.filename || null;
+        const mainPhotos = req.files['main_photos']?.map(file => file.filename) || [];
+        const optionalPhotos = req.files['photos']?.map(file => file.filename) || [];
+        const video = req.files['video']?. [0]?.filename || null;
+        console.log(req.files);
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
