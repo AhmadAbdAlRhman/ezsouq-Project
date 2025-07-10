@@ -12,7 +12,7 @@ const CategorySchema = new mongoose.Schema({
 CategorySchema.pre('remove', async function (next) {
     try {
         await Product.deleteMany({
-            Category_id: this._id
+            Category_name: this.name
         });
         next();
     } catch (err) {

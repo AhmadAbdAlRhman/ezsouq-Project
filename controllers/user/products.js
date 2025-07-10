@@ -24,7 +24,6 @@ module.exports.getAllSortedProducts = async (req, res) => {
         const order = req.query.order === 'desc' ? -1 : 1;
         const total = await Products.countDocuments();
         await Products.find()
-            .populate('Category_id')
             .populate(
                 'Owner_id', 'name avatar phone'
             )
@@ -65,12 +64,11 @@ module.exports.getFilteredProducts = async (req, res) => {
         if (req.query.governorates)
             filter.Governorates_id = req.query.governorates;
         if (req.query.Category)
-            filter.Category_id = req.query.Category;
+            filter.Category_name = req.query.Category;
         const total = await Products.countDocuments(filter);
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
         await Products.find(filter)
-            .populate('Category_id')
             .populate('Owner_id', 'name avatar phone')
             .sort({
                 [sortField]: order
@@ -102,7 +100,7 @@ module.exports.addProduct = async (req, res) => {
         const Owner_id = req.query.owner_id;
         const {
             name,
-            Category_id,
+            Category_name,
             Governorate_name,
             city,
             description,
@@ -128,7 +126,7 @@ module.exports.addProduct = async (req, res) => {
         const new_product = await Products.create({
             Owner_id,
             name,
-            Category_id,
+            Category_name,
             Governorate_name,
             city,
             main_photos: mainPhotos,
@@ -165,7 +163,7 @@ module.exports.getOneProduct = async (req, res) => {
         });
     await Products.findById(
             pro_id
-        ).populate('Category_id') // فقط الاسم من الفئة
+        )
         .populate('Owner_id', 'name avatar phone')
         .then((pro) => {
             if (!pro)
@@ -201,7 +199,7 @@ module.exports.search = async (req, res) => {
             ]
         } : {};
         const products = await Products.find(filter)
-            .populate('Category_id')
+            
             .populate('Owner_id', 'name avatar phone')
             .exec();
             return res.status(200).json(products);
