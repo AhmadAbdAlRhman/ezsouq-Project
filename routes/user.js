@@ -18,7 +18,7 @@ router.get('/search_product', products.search);
 router.post('/report', protect, products.reportProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
-router.put('/update_information/:user_id', protect, user.updateInformationUser);
+router.put('/update_information', protect, user.updateInformationUser);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     // protect,
