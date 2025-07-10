@@ -15,16 +15,25 @@ router.get('/fliteredProducts', products.getFilteredProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/product/:id', products.getOneProduct);
 router.get('/search_product', products.search);
+router.post('/report', protect, products.reportProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
 router.get('/update_information/:user_id', user.updateInformationUser);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     // protect,
-    upload.fields([
-        {name: 'main_photos', maxCount: 3},
-        {name: 'photos', maxCount: 2},
-        {name: 'video', maxCount: 1}
+    upload.fields([{
+            name: 'main_photos',
+            maxCount: 3
+        },
+        {
+            name: 'photos',
+            maxCount: 2
+        },
+        {
+            name: 'video',
+            maxCount: 1
+        }
     ]),
     products.addProduct);
 module.exports = router;

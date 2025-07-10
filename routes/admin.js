@@ -36,5 +36,10 @@ router.post('/add_category',
     protect,
     checkRole(['ADMIN', 'OWNER']),
     products.addCtegory);
-
+//عرض التقراير
+router.get('/reports',
+    // protect,
+    // checkRole(['ADMIN', 'OWNER']),
+    products.getAllReports
+);
 module.exports = router;

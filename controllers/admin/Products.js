@@ -1,4 +1,5 @@
 const Category = require('../../models/Category');
+const Report = require('../../models/Report');
 
 module.exports.addCtegory = async (req, res) => {
     try {
@@ -28,3 +29,16 @@ module.exports.addCtegory = async (req, res) => {
         });
     }
 }
+
+module.exports.getAllReports = async (req, res) => {
+    try {
+        const reports = await Report.find()
+            .populate('product', 'name')        // عرض اسم المنتج فقط
+            .populate('reported_by', 'username email') // عرض اسم وبريد المبلّغ
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(reports);
+    } catch (error) {
+        res.status(500).json({ message: 'فشل في جلب البلاغات', error: error.message });
+    }
+};
