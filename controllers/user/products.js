@@ -1,6 +1,7 @@
 const Gategory = require('../../models/Category');
 const Products = require('../../models/products');
 const Report = require('../../models/Report');
+const User = require('../../models/users');
 const mongoose = require('mongoose');
 module.exports.getAllCategories = async (_req, res) => {
     await Gategory.find({}).then((gategory) => {
@@ -117,7 +118,7 @@ module.exports.addProduct = async (req, res) => {
         } = req.body;
         const mainPhotos = req.files['main_photos']?.map(file => file.filename) || [];
         const optionalPhotos = req.files['photos']?.map(file => file.filename) || [];
-        const video = req.files['video']?. [0]?.filename || null;
+        const video = req.files['video']?.[0]?.filename || null;
         console.log(req.files);
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
@@ -235,6 +236,51 @@ module.exports.reportProducts = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ أثناء الإبلاغ",
+            error: err.message
+        });
+    }
+}
+
+module.exports.toggleFavorite = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const product_id = req.body.product_id;
+
+        if (!user_id || !product_id) {
+            return res.status(400).json({
+                message: 'الرجاء تمرير معرف المستخدم ومعرف المنتج'
+            });
+        }
+
+        // جلب المستخدم
+        const user = await User.findById(user_id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'المستخدم غير موجود'
+            });
+        }
+
+        const isFavorite = user.favorites.includes(product_id);
+
+        if (isFavorite) {
+            // إزالة المنتج من المفضلة
+            user.favorites.pull(product_id);
+        } else {
+            // إضافة المنتج إلى المفضلة
+            user.favorites.addToSet(product_id); // addToSet يمنع التكرار
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            message: isFavorite ? 'تمت إزالة المنتج من المفضلة' : 'تمت إضافة المنتج إلى المفضلة',
+            favorite: !isFavorite
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'حدث خطأ أثناء تعديل المفضلة',
             error: err.message
         });
     }

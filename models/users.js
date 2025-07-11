@@ -46,7 +46,11 @@ const UserSchema = new mongoose.Schema({
     whats_app:{
         type: Number,
         required: false
-    }
+    },
+    favorites: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+    }]
 }, options);
 
 UserSchema.pre("save", async function (next) {
