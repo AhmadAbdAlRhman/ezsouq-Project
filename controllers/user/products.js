@@ -127,20 +127,17 @@ try {
         if (!name || !Category_name || !Governorate_name || !city || !price) {
             return res.status(400).json({ message: "الرجاء تعبئة جميع الحقول الأساسية." });
         }
-
         // رفع الصور والفيديو
         const mainPhotos = req.files?.['main_photos']?.map(file => file.filename) || [];
         const optionalPhotos = req.files?.['photos']?.map(file => file.filename) || [];
         const video = req.files?.['video']?.[0]?.filename || null;
-
         // تحقق من عدد الصور الأساسية
-        if (mainPhotos.length !== 2) {
+        if (mainPhotos.length !== 3) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
                 current_count: mainPhotos.length
             });
         }
-
         // تأكد من تحويل القيم المنطقية
         const new_product = await Products.create({
             Owner_id,
