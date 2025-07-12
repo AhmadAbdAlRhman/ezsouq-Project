@@ -120,7 +120,7 @@ module.exports.addProduct = async (req, res) => {
         const optionalPhotos = req.files['photos']?.map(file => file.filename) || [];
         const video = req.files['video']?.[0]?.filename || null;
         console.log(req.files);
-        if (mainPhotos.length !== 3) {
+        if (mainPhotos.length !== 2) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
                 current_count: mainPhotos.length
