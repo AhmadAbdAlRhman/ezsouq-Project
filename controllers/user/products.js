@@ -97,6 +97,7 @@ module.exports.getFilteredProducts = async (req, res) => {
     }
 }
 
+module.exports.addProduct = async (req, res) => {
 try {
         const Owner_id = req.query.owner_id;
 
@@ -174,7 +175,7 @@ try {
             error: err.message
         });
     }
-
+}
 module.exports.getOneProduct = async (req, res) => {
     const pro_id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(pro_id))
