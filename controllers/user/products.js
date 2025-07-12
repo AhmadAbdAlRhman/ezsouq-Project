@@ -97,9 +97,14 @@ module.exports.getFilteredProducts = async (req, res) => {
     }
 }
 
-module.exports.addProduct = async (req, res) => {
-    try {
+try {
         const Owner_id = req.query.owner_id;
+
+        // تحقق من وجود Owner ID
+        if (!Owner_id) {
+            return res.status(400).json({ message: "يجب تمرير معرف المالك (owner_id)" });
+        }
+
         const {
             name,
             Category_name,
@@ -116,16 +121,26 @@ module.exports.addProduct = async (req, res) => {
             processor,
             storage
         } = req.body;
-        const mainPhotos = req.files['main_photos']?.map(file => file.filename) || [];
-        const optionalPhotos = req.files['photos']?.map(file => file.filename) || [];
-        const video = req.files['video']?.[0]?.filename || null;
-        console.log(req.files);
-        if (mainPhotos.length !== 2) {
+
+        // تحقق من الحقول الأساسية
+        if (!name || !Category_name || !Governorate_name || !city || !price) {
+            return res.status(400).json({ message: "الرجاء تعبئة جميع الحقول الأساسية." });
+        }
+
+        // رفع الصور والفيديو
+        const mainPhotos = req.files?.['main_photos']?.map(file => file.filename) || [];
+        const optionalPhotos = req.files?.['photos']?.map(file => file.filename) || [];
+        const video = req.files?.['video']?.[0]?.filename || null;
+
+        // تحقق من عدد الصور الأساسية
+        if (mainPhotos.length !== 3) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
                 current_count: mainPhotos.length
             });
         }
+
+        // تأكد من تحويل القيم المنطقية
         const new_product = await Products.create({
             Owner_id,
             name,
@@ -138,25 +153,27 @@ module.exports.addProduct = async (req, res) => {
             video,
             photos: optionalPhotos,
             color,
-            isnew,
+            isnew: isnew === 'true' || isnew === true,
+            for_sale: for_sale === 'true' || for_sale === true,
+            is_Furniture: is_Furniture === 'true' || is_Furniture === true,
             shape,
             real_estate_type,
-            for_sale,
-            is_Furniture,
             processor,
             storage
         });
+
         res.status(201).json({
             message: "تمت إضافة العرض بنجاح",
             product: new_product
         });
+
     } catch (err) {
+        console.error("خطأ أثناء إضافة المنتج:", err); // مفيد لتتبع الخطأ في اللوغ
         res.status(500).json({
             message: "حدث خطأ أثناء إضافة المنتج",
             error: err.message
-        })
+        });
     }
-}
 
 module.exports.getOneProduct = async (req, res) => {
     const pro_id = req.params.id;
