@@ -102,6 +102,10 @@ const ProductsSchema = new mongoose.Schema({
     //for mobile
     processor: String,
     Sotarge: Number,
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users'
+    }]
 }, {
     timestamps: true
 });

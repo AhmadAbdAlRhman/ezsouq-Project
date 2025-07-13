@@ -300,3 +300,31 @@ module.exports.toggleFavorite = async (req, res) => {
         });
     }
 }
+
+module.exports.toggleLike = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const product_id = req.body;
+        if (!user_id || !product_id) 
+            return res.status(400).json({ message: 'يرجى تمرير معرف المستخدم والمنتج' });
+        const product = await Products.findById(product_id);
+        if (!product) 
+            return res.status(404).json({ message: 'المنتج غير موجود' });
+        const alreadyLiked = product.likes.includes(user_id);
+        if (alreadyLiked)
+            product.likes.pull(user_id);
+        else
+            product.likes.addToSet(user_id);
+        await product.save();
+        res.status(200).json({
+            message: alreadyLiked ? 'تم إلغاء الإعجاب' : 'تم تسجيل الإعجاب',
+            liked: !alreadyLiked,
+            totalLikes: product.likes.length
+        });
+    }catch(err){
+        res.status(500).json({
+            message: 'حدث خطأ أثناء تعديل الإعجاب',
+            error: err.message
+        });
+    }
+}
