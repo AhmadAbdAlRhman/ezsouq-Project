@@ -334,3 +334,24 @@ module.exports.toggleLike = async (req, res) => {
         });
     }
 }
+
+module.exports.getAllLikes = async (req, res) => {
+    const productId = req.query.productId;
+    await Products.findById(productId).populate('likes', 'name')
+    .then((product) => {
+        if (!product)
+            return res.status(404).json({message:"المنتج غير موجود حالياً."});
+        const likesCount = product.likes.length;
+        const likers = product.likes.map(user => user.name); // استخراج أسماء المعجبين
+        return res.status(200).json({
+            count: likesCount,
+            users: likers
+        });
+    }).catch((err)=>{
+        return res.status(500).json({ message: "حدث خطأ أثناء جلب الإعجابات.", Error:err.message });
+    })
+}
+
+module.exports.getAllwishes = async (req, res) => {
+
+}
