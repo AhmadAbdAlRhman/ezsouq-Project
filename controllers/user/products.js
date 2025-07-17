@@ -355,4 +355,21 @@ module.exports.getAllLikes = async (req, res) => {
 
 module.exports.getAllwishes = async (req, res) => {
     const user_id = req.user.id;
+    await User.findById(user_id)
+    .select('favorites')
+    .populate('favorites' ,'_id name main_photos').then((user) => {
+        if (!user)
+            return res.status(404).json({message:"المستخدم غير موجود"});
+        const favorites = user.favorites;
+        const favoritesCount = favorites.length;
+        res.status(200).json({
+            count: favoritesCount,
+            favorites: favorites
+        });
+    }).catch((err) => {
+        res.status(500).json({
+            message: "حدث خطأ أثناء جلب العناصر المفضلة",
+            error: err.message
+        });
+    });
 }
