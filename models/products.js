@@ -7,7 +7,7 @@ const ProductsSchema = new mongoose.Schema({
     },
     Category_name: {
         type: String,
-        ref: 'category',
+        ref: 'category',    
         required: true,
     },
     Owner_id: {

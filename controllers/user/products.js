@@ -309,8 +309,8 @@ module.exports.toggleFavorite = async (req, res) => {
 
 module.exports.toggleLike = async (req, res) => {
     try {
-        const user_id = req.user.id;
-        const product_id = req.body;
+        const user_id = "6866fa02ec9e69a29606e52c";
+        const product_id = req.body.product_id;
         if (!user_id || !product_id) 
             return res.status(400).json({ message: 'يرجى تمرير معرف المستخدم والمنتج' });
         const product = await Products.findById(product_id);
@@ -321,6 +321,7 @@ module.exports.toggleLike = async (req, res) => {
             product.likes.pull(user_id);
         else
             product.likes.addToSet(user_id);
+        product.Category_name = product.Category_name;
         await product.save();
         res.status(200).json({
             message: alreadyLiked ? 'تم إلغاء الإعجاب' : 'تم تسجيل الإعجاب',
