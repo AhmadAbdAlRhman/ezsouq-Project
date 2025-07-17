@@ -309,7 +309,7 @@ module.exports.toggleFavorite = async (req, res) => {
 
 module.exports.toggleLike = async (req, res) => {
     try {
-        const user_id = "6866fa02ec9e69a29606e52c";
+        const user_id = req.user.id;
         const product_id = req.body.product_id;
         if (!user_id || !product_id) 
             return res.status(400).json({ message: 'يرجى تمرير معرف المستخدم والمنتج' });
@@ -354,5 +354,5 @@ module.exports.getAllLikes = async (req, res) => {
 }
 
 module.exports.getAllwishes = async (req, res) => {
-
+    const user_id = req.user.id;
 }
