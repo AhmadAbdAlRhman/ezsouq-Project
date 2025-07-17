@@ -14,7 +14,7 @@ const ReportSchema = new mongoose.Schema({
     reason: {
         type: String,
         required: true,
-        enum: ['محتوى مزيف', 'منتج مكرر', 'مخالف للشروط', 'أخرى']
+        enum: ['محتوى مزيف', 'منتج مكرر', 'مخالف للشروط', 'أخرى','']
     },
     message: {
         type: String

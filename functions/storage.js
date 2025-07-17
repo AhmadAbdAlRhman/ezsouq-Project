@@ -9,8 +9,10 @@ const storage = multer.diskStorage({
         else
             cb(new Error('الملف غير مسموح به'), null);
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+    filename: (_req, file, cb) => {
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const cleanName = file.originalname.replace(/\s+/g, '-');
+        cb(null, `${timestamp}-${cleanName}`);
     }
 });
 

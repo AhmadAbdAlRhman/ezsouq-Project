@@ -60,7 +60,8 @@ const ProductsSchema = new mongoose.Schema({
         type:String,
         enum:[
             'اتوماتيك',
-            'غيير عادي'
+            'غيير عادي',
+            ''
         ],
         default: null
     },
@@ -73,6 +74,7 @@ const ProductsSchema = new mongoose.Schema({
             'سباق',
             'سوزوكي',
             'جبلي',
+            ''
         ],
         default: null
     },
@@ -84,7 +86,8 @@ const ProductsSchema = new mongoose.Schema({
             'أرض',
             'عيادة أسنان',
             'فيلة',
-            'شاليه'
+            'شاليه',
+            ''
         ],
         default: null
     },

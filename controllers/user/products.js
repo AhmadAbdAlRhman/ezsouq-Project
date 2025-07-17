@@ -138,6 +138,13 @@ try {
                 current_count: mainPhotos.length
             });
         }
+        // تحقق من عدد الصور الإضافية
+        if (optionalPhotos.length > 2) {
+            return res.status(400).json({
+                message: 'لا يمكنك رفع أكثر من صورتين.',
+                current_count: mainPhotos.length
+            });
+        }
         // تأكد من تحويل القيم المنطقية
         const new_product = await Products.create({
             Owner_id,
@@ -217,7 +224,6 @@ module.exports.search = async (req, res) => {
             ]
         } : {};
         const products = await Products.find(filter)
-
             .populate('Owner_id', 'name avatar phone')
             .exec();
         return res.status(200).json(products);
