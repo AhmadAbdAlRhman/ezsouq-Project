@@ -8,7 +8,7 @@ const feedbackSchema = new mongoose.Schema({
     },
     user_id: {
         type: Schema.Types.ObjectId,
-        ref:'users',
+        ref:'Users',
         required: true
     },
     product_id:{
