@@ -35,7 +35,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
             feedbacks,
         });
         }).catch((err)=>{
-            res.status(500).json({ message: 'حدث خطأ أثناء جلب التعليقات', err });
+            res.status(500).json({ message: 'حدث خطأ أثناء جلب التعليقات', Error:err.message });
         });
 }
 
