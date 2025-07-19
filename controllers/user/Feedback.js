@@ -19,7 +19,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
-    const total = await Feedback.countDocuments({ product_id: productId });
+    const total = await Feedback.countDocuments({ product_id });
     await Feedback.find({ product_id })
         .populate('user_id', 'name avatar')
         .sort({ createdAt: -1 })
