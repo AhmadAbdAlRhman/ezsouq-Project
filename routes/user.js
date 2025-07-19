@@ -23,9 +23,9 @@ router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/comment', protect, feedback.comment);
-router.get('/all_comments', feedback.getAllCommentForProduct);
-router.delete('/delete_comment', protect, feedback.deleteComment);
-router.put('/update_comment', protect, feedback.updateComments);
+router.get('/all_comments/:product_id', feedback.getAllCommentForProduct);
+router.delete('/delete_comment/:comment_id', protect, feedback.deleteComment);
+router.put('/update_comment/:comment_id', protect, feedback.updateComments);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
 router.put('/update_information', protect, user.updateInformationUser);

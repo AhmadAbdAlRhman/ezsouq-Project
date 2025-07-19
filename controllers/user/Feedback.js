@@ -40,7 +40,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
 }
 
 module.exports.deleteComment = async (req, res) =>{
-    const  id  = req.params.id;
+    const  id  = req.params.comment_id;
     await Feedback.findByIdAndDelete(id).then((deleted) => {
         if (!deleted) 
             return res.status(404).json({ message: 'لم يتم العثور على التعليق' });
@@ -51,7 +51,7 @@ module.exports.deleteComment = async (req, res) =>{
 }
 
 module.exports.updateComments = async (req, res) => {
-    const  id = req.params.id;
+    const  id = req.params.comment_id;
     const comments = req.body.comments;
     if (!comments || comments.trim() === '') 
         return res.status(400).json({ message: 'يرجى إدخال تعليق صالح' });
