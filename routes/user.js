@@ -3,6 +3,7 @@ const router = express.Router();
 const governorates = require('../controllers/user/Governorates');
 const products = require('../controllers/user/products');
 const user = require('../controllers/user/user');
+const feedback = require('../controllers/user/Feedback');
 const upload = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 
@@ -20,6 +21,11 @@ router.get('/get_all_wishes',protect, products.getAllwishes)
 router.post('/report', protect, products.reportProducts);
 router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+router.post('/comment', protect, feedback.comment);
+router.get('/all_comments', feedback.getAllCommentForProduct);
+router.delete('/delete_comment', protect, feedback.deleteComment);
+router.put('/update_comment', protect, feedback.updateComments);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
 router.put('/update_information', protect, user.updateInformationUser);
