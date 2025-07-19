@@ -1,5 +1,5 @@
 const Feedback = require('../../models/feedback');
-
+const mongoose = require('mongoose');
 module.exports.comment = async (req, res) =>{
     const user_id = req.user.id;
     const product_id  = req.body.product_id ;
@@ -19,8 +19,9 @@ module.exports.getAllCommentForProduct = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
-    const total = await Feedback.countDocuments({ product_id });
-    await Feedback.find({ product_id })
+    const productObjectId = new mongoose.Types.ObjectId(product_id);
+    const total = await Feedback.countDocuments({ product_id: product_id });
+    await Feedback.find({ product_id : productObjectId})
         .populate('user_id', 'name avatar')
         .sort({ createdAt: -1 })
         .skip(skip)
