@@ -63,7 +63,7 @@ module.exports.updateInformationUser = async (req, res) => {
 module.exports.ratingPublisher = async (req, res) => {
     const userId = req.user.id;
     const publishId = req.body.user_id;
-    const ratingValue = paresInt(req.body.rating);
+    const ratingValue = parseInt(req.body.rating);
     if (!ratingValue || ratingValue < 1 || ratingValue > 5)
         return res.status(400).json({
             message: "التقييم يجب أن يكون بين 1 و 5"
