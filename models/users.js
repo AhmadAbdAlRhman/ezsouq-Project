@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    phone:{
+    phone: {
         type: Number
     },
     Location: {
@@ -30,9 +30,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    work_type:{
+    work_type: {
         type: String,
-        required:false
+        required: false
     },
     Role: {
         type: String,
@@ -43,14 +43,29 @@ const UserSchema = new mongoose.Schema({
             'OWNER'
         ]
     },
-    whats_app:{
+    whats_app: {
         type: Number,
         required: false
     },
     favorites: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Products'
-    }]
+    }],
+    ratings: [{
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5
+        }
+    }],
+    averageRating: {
+        type: Number,
+        default: 0
+    }
 }, options);
 
 UserSchema.pre("save", async function (next) {

@@ -21,6 +21,7 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
@@ -32,6 +33,7 @@
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
     "querystring": "^0.2.1",
+    "sharp": "^0.34.2",
     "socket.io": "^4.8.1"
   }
 }

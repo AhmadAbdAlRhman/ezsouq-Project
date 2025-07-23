@@ -29,6 +29,7 @@ router.put('/update_comment/:comment_id', protect, feedback.updateComments);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/get_user/:user_id', user.getOneUser);
 router.put('/update_information', protect, user.updateInformationUser);
+router.post('/publish_owner', protect, user.ratingPublisher);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,
