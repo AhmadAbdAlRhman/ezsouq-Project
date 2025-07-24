@@ -98,8 +98,7 @@ module.exports.getAllUser = async (req, res) => {
             roleFilter = { Role: { $in: ['USER', 'ADMIN'] } };
         }
         const filter = {
-            ...roleFilter,
-            Role: { $ne: 'OWNER', ...(roleFilter.Role ? { $eq: roleFilter.Role } : {}) }
+            Role: { $in: roleFilter }
         };
         const [users, total] = await Promise.all([
             User.find(filter).skip(skip).limit(limit),
