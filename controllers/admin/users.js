@@ -82,3 +82,62 @@ module.exports.DeleteUser = async (req, res) => {
         });
     });
 }
+
+module.exports.getAllUser = async (req, res) => {
+    try{
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page - 1) * limit;
+        const roleQuery = req.query.role || 'both';
+        let roleFilter = {};
+        if (roleQuery === 'USER') {
+            roleFilter = { Role: 'USER' };
+        } else if (roleQuery === 'ADMIN') {
+            roleFilter = { Role: 'ADMIN' };
+        } else {
+            roleFilter = { Role: { $in: ['USER', 'ADMIN'] } };
+        }
+        const filter = {
+            ...roleFilter,
+            Role: { $ne: 'OWNER', ...(roleFilter.Role ? { $eq: roleFilter.Role } : {}) }
+        };
+        const [users, total] = await Promise.all([
+            User.find(filter).skip(skip).limit(limit),
+            User.countDocuments(filter)
+        ]);
+        const totalPages = Math.ceil(total / limit);
+        return res.status(200).json({
+            data: users,
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+        });
+    }catch(err){
+        console.error('Error getting users:', err);
+        return res.status(500).json({ message: 'فشل في جلب المستخدمين', error: err.message });
+    }
+
+}
+module.exports.getUser = async (req, res) => {
+    try{
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page - 1) * limit;
+        const filter = { Role: 'USER' };
+        const [users, total] = await Promise.all([
+            User.find(filter).skip(skip).limit(limit),
+            User.countDocuments(filter)
+        ]);
+        const totalPages = Math.ceil(total / limit);
+        return res.status(200).json({
+            data: users,
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+        });
+    }catch(err){
+        console.error('Error getting users:', err);
+        return res.status(500).json({ message: 'فشل في جلب المستخدمين', error: err.message });
+    }
+
+}

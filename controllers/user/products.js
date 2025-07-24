@@ -98,12 +98,14 @@ module.exports.getFilteredProducts = async (req, res) => {
 }
 
 module.exports.addProduct = async (req, res) => {
-try {
+    try {
         const Owner_id = req.query.owner_id;
 
         // تحقق من وجود Owner ID
         if (!Owner_id) {
-            return res.status(400).json({ message: "يجب تمرير معرف المالك (owner_id)" });
+            return res.status(400).json({
+                message: "يجب تمرير معرف المالك (owner_id)"
+            });
         }
 
         const {
@@ -125,12 +127,14 @@ try {
 
         // تحقق من الحقول الأساسية
         if (!name || !Category_name || !Governorate_name || !city || !price) {
-            return res.status(400).json({ message: "الرجاء تعبئة جميع الحقول الأساسية." });
+            return res.status(400).json({
+                message: "الرجاء تعبئة جميع الحقول الأساسية."
+            });
         }
         // رفع الصور والفيديو
-        const mainPhotos = req.files?.['main_photos']?.map(file => file.filename) || [];
-        const optionalPhotos = req.files?.['photos']?.map(file => file.filename) || [];
-        const video = req.files?.['video']?.[0]?.filename || null;
+        const mainPhotos = req.files ?. ['main_photos'] ?.map(file => file.filename) || [];
+        const optionalPhotos = req.files ?. ['photos'] ?.map(file => file.filename) || [];
+        const video = req.files ?. ['video'] ?. [0] ?.filename || null;
         // تحقق من عدد الصور الأساسية
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
@@ -204,10 +208,13 @@ module.exports.getOneProduct = async (req, res) => {
                 });
         })
 }
-
 module.exports.search = async (req, res) => {
     try {
-        const keyword = req.query.keyword;
+        const keyword = req.query.keyword || '';
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page - 1) * limit;
+
         const filter = keyword ? {
             $or: [{
                     name: {
@@ -223,10 +230,24 @@ module.exports.search = async (req, res) => {
                 }
             ]
         } : {};
-        const products = await Products.find(filter)
+
+        const [products, total] = await Promise.all([
+            Products.find(filter)
             .populate('Owner_id', 'name avatar phone')
-            .exec();
-        return res.status(200).json(products);
+            .skip(skip)
+            .limit(limit)
+            .exec(),
+            Products.countDocuments(filter)
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return res.status(200).json({
+            data: products,
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+        });
     } catch (err) {
         console.error('Error during product search:', err);
         return res.status(500).json({
@@ -311,11 +332,15 @@ module.exports.toggleLike = async (req, res) => {
     try {
         const user_id = req.user.id;
         const product_id = req.body.product_id;
-        if (!user_id || !product_id) 
-            return res.status(400).json({ message: 'يرجى تمرير معرف المستخدم والمنتج' });
+        if (!user_id || !product_id)
+            return res.status(400).json({
+                message: 'يرجى تمرير معرف المستخدم والمنتج'
+            });
         const product = await Products.findById(product_id);
-        if (!product) 
-            return res.status(404).json({ message: 'المنتج غير موجود' });
+        if (!product)
+            return res.status(404).json({
+                message: 'المنتج غير موجود'
+            });
         const alreadyLiked = product.likes.includes(user_id);
         if (alreadyLiked)
             product.likes.pull(user_id);
@@ -328,7 +353,7 @@ module.exports.toggleLike = async (req, res) => {
             liked: !alreadyLiked,
             totalLikes: product.likes.length
         });
-    }catch(err){
+    } catch (err) {
         res.status(500).json({
             message: 'حدث خطأ أثناء تعديل الإعجاب',
             error: err.message
@@ -339,37 +364,44 @@ module.exports.toggleLike = async (req, res) => {
 module.exports.getAllLikes = async (req, res) => {
     const productId = req.query.productId;
     await Products.findById(productId).populate('likes', 'name')
-    .then((product) => {
-        if (!product)
-            return res.status(404).json({message:"المنتج غير موجود حالياً."});
-        const likesCount = product.likes.length;
-        const likers = product.likes.map(user => user.name); // استخراج أسماء المعجبين
-        return res.status(200).json({
-            count: likesCount,
-            users: likers
-        });
-    }).catch((err)=>{
-        return res.status(500).json({ message: "حدث خطأ أثناء جلب الإعجابات.", Error:err.message });
-    })
+        .then((product) => {
+            if (!product)
+                return res.status(404).json({
+                    message: "المنتج غير موجود حالياً."
+                });
+            const likesCount = product.likes.length;
+            const likers = product.likes.map(user => user.name); // استخراج أسماء المعجبين
+            return res.status(200).json({
+                count: likesCount,
+                users: likers
+            });
+        }).catch((err) => {
+            return res.status(500).json({
+                message: "حدث خطأ أثناء جلب الإعجابات.",
+                Error: err.message
+            });
+        })
 }
 
 module.exports.getAllwishes = async (req, res) => {
     const user_id = req.user.id;
     await User.findById(user_id)
-    .select('favorites')
-    .populate('favorites' ,'_id name main_photos').then((user) => {
-        if (!user)
-            return res.status(404).json({message:"المستخدم غير موجود"});
-        const favorites = user.favorites;
-        const favoritesCount = favorites.length;
-        res.status(200).json({
-            count: favoritesCount,
-            favorites: favorites
+        .select('favorites')
+        .populate('favorites', '_id name main_photos').then((user) => {
+            if (!user)
+                return res.status(404).json({
+                    message: "المستخدم غير موجود"
+                });
+            const favorites = user.favorites;
+            const favoritesCount = favorites.length;
+            res.status(200).json({
+                count: favoritesCount,
+                favorites: favorites
+            });
+        }).catch((err) => {
+            res.status(500).json({
+                message: "حدث خطأ أثناء جلب العناصر المفضلة",
+                error: err.message
+            });
         });
-    }).catch((err) => {
-        res.status(500).json({
-            message: "حدث خطأ أثناء جلب العناصر المفضلة",
-            error: err.message
-        });
-    });
 }
