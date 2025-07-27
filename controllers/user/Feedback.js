@@ -38,6 +38,8 @@ module.exports.getAllCommentForProduct = async (req, res) => {
             product_id: productObjectId
         })
         .populate('user_id', 'name avatar')
+        .populate('product_id', 'id name')
+        .populate('parent_comment' , 'comments')
         .sort({
             createdAt: -1
         })
