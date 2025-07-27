@@ -15,6 +15,11 @@ const feedbackSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref:'products',
         required: true
+    },
+    parent_comment: {
+        type: Schema.Types.ObjectId,
+        ref: 'feedback',
+        default: null
     }
 }, { timestamps: true });
 const Feedback = mongoose.model("feedback",feedbackSchema);
