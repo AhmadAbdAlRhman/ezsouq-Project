@@ -13,7 +13,7 @@ const feedbackSchema = new mongoose.Schema({
     },
     product_id:{
         type: Schema.Types.ObjectId,
-        ref:'products',
+        ref:'Products',
         required: true
     },
     parent_comment: {
