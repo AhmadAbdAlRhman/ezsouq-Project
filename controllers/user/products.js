@@ -71,7 +71,7 @@ module.exports.getFilteredProducts = async (req, res) => {
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
         await Products.find(filter)
-            .populate('Owner_id', 'name avatar phone')
+            .populate('Owner_id', 'name avatar phone whats_app averageRating')
             .sort({
                 [sortField]: order
             })
