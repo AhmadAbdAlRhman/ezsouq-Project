@@ -317,7 +317,8 @@ module.exports.toggleFavorite = async (req, res) => {
 
         return res.status(200).json({
             message: isFavorite ? 'تمت إزالة المنتج من المفضلة' : 'تمت إضافة المنتج إلى المفضلة',
-            favorite: !isFavorite
+            favorite: !isFavorite,
+            productId: product_id
         });
 
     } catch (err) {
