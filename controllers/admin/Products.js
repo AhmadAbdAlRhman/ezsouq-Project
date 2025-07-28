@@ -29,16 +29,3 @@ module.exports.addCtegory = async (req, res) => {
         });
     }
 }
-
-module.exports.getAllReports = async (req, res) => {
-    try {
-        const reports = await Report.find()
-            .populate('product', 'name')
-            .populate('reported_by', 'username email')
-            .sort({ createdAt: -1 });
-
-        res.status(200).json(reports);
-    } catch (error) {
-        res.status(500).json({ message: 'فشل في جلب البلاغات', error: error.message });
-    }
-};

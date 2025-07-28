@@ -4,8 +4,10 @@ const governorates = require('../controllers/user/Governorates');
 const products = require('../controllers/user/products');
 const user = require('../controllers/user/user');
 const feedback = require('../controllers/user/Feedback');
+const report = require('../controllers/user/Reported');
 const upload = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
+const checkRole = require('../middleware/checkRole');
 
 router.get('/governorates', governorates.getAllgovernorates);
 router.get('/cities/:name', governorates.getAllCities);
@@ -18,10 +20,13 @@ router.get('/product/:id', products.getOneProduct);
 router.get('/search_product', products.search);
 router.get('/get_all_likes', products.getAllLikes)
 router.get('/get_all_wishes',protect, products.getAllwishes)
-router.post('/report', protect, products.reportProducts);
-// router.get('/all_report', protect, products.get_all_reportedProducts);
 router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+router.post('/report', protect, report.reportProducts);
+router.get('/get_one_report/:reporteId', protect, report.get_one_reporte);
+router.put('/update_report/:reporteId', protect, report.get_one_reporte);
+router.delete('/delete_report/:reporteId', protect, report.get_one_reporte);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/comment', protect, feedback.comment);
 router.get('/all_comments/:product_id', feedback.getAllCommentForProduct);

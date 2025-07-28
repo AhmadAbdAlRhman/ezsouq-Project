@@ -1,6 +1,5 @@
 const Gategory = require('../../models/Category');
 const Products = require('../../models/products');
-const Report = require('../../models/Report');
 const User = require('../../models/users');
 const mongoose = require('mongoose');
 module.exports.getAllCategories = async (_req, res) => {
@@ -253,32 +252,6 @@ module.exports.search = async (req, res) => {
         return res.status(500).json({
             message: 'حدث خطأ أثناء البحث عن المنتجات',
             error: err.message,
-        });
-    }
-}
-
-module.exports.reportProducts = async (req, res) => {
-    try {
-        const {
-            productId,
-            reason,
-            message
-        } = req.body;
-        const userId = req.user.id;
-        const newReport = new Report({
-            product: productId,
-            reported_By: userId,
-            reason,
-            message
-        });
-        await newReport.save();
-        res.status(201).json({
-            message: 'تم اإبلاغ عن المنتج بنجاح'
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: "حدث خطأ أثناء الإبلاغ",
-            error: err.message
         });
     }
 }
