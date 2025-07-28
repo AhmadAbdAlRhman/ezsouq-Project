@@ -25,8 +25,8 @@ router.post('/likedProduct', protect, products.toggleLike);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/report', protect, report.reportProducts);
 router.get('/get_one_report/:reporteId', protect, report.get_one_reporte);
-router.put('/update_report/:reporteId', protect, report.get_one_reporte);
-router.delete('/delete_report/:reporteId', protect, report.get_one_reporte);
+router.put('/update_report/:reporteId', protect, report.update_reporte);
+router.delete('/delete_report/:reporteId', protect, report.delete_reporte);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/comment', protect, feedback.comment);
 router.get('/all_comments/:product_id', feedback.getAllCommentForProduct);
