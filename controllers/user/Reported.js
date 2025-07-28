@@ -95,13 +95,16 @@ module.exports.delete_reporte = async (req, res) => {
 module.exports.update_reporte = async (req, res) => {
     try {
         const reportedId = req.params.reporteId;
+        const reason = req.body.reason;
+        const message = req.body.message;
         const report = await Report.findById(reportedId);
         if (!report)
             return res.status(404).json({
                 message: "الإبلاغ غير موجود"
             })
         const updatedreport = await Report.findByIdAndUpdate(reportedId, {
-            $set: req.body
+            reason,
+            message
         }, {
             new: true,
             runValidators: true
