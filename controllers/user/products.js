@@ -319,24 +319,29 @@ module.exports.toggleLike = async (req, res) => {
 
 module.exports.getAllLikes = async (req, res) => {
     const productId = req.query.productId;
-    await Products.findById(productId).populate('likes', 'name')
-        .then((product) => {
-            if (!product)
-                return res.status(404).json({
-                    message: "المنتج غير موجود حالياً."
-                });
+    const userid = req.user.id;
+    try{
+        const product = Products.findById(productId).populate('likes', 'name');
+        if (!product)
+            return res.status(404).json({
+                message: "المنتج غير موجود حالياً."
+            });
             const likesCount = product.likes.length;
-            const likers = product.likes.map(user => user.name); // استخراج أسماء المعجبين
+            const likers = product.likes.map(user => user.name);
+            const currentUserIsLike = product.likes.some(
+                user => user._id.toString() === userid.toString()
+            );
             return res.status(200).json({
                 count: likesCount,
-                users: likers
+                users: likers,
+                current_user_is_like:currentUserIsLike
             });
-        }).catch((err) => {
-            return res.status(500).json({
-                message: "حدث خطأ أثناء جلب الإعجابات.",
-                Error: err.message
-            });
-        })
+
+    }catch(err){
+        return res.status(500).json({
+            message: "حدث خطأ أثناء جلب الإعجابات.",
+            Error: err.message
+        });
 }
 
 module.exports.setViews = async (req, res) => {
