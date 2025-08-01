@@ -318,19 +318,23 @@ module.exports.toggleLike = async (req, res) => {
 }
 
 module.exports.getAllLikes = async (req, res) => {
-    const userid = req.user.id;
+    let  userid = null;
+    let currentUserIsLike = true;
     const productId = req.query.productId;
     try {
         const product = Products.findById(productId).populate('likes', 'name');
         if (!product)
             return res.status(404).json({
-                message: "المنتج غير موجود حالياً."
-            });
-        const likesCount = product.likes.length;
-        const likers = product.likes.map(user => user.name);
-        const currentUserIsLike = product.likes.some(
+        message: "المنتج غير موجود حالياً."
+    });
+    const likesCount = product.likes.length;
+    const likers = product.likes.map(user => user.name);
+    if (req.user){
+        userid = req.user.id;
+        currentUserIsLike = product.likes.some(
             user => user._id.toString() === userid.toString()
         );
+    }
         return res.status(200).json({
             count: likesCount,
             users: likers,
