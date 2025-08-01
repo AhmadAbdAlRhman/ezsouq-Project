@@ -319,7 +319,7 @@ module.exports.toggleLike = async (req, res) => {
 
 module.exports.getAllLikes = async (req, res) => {
     let  userid = null;
-    let currentUserIsLike = true;
+    let currentUserIsLike = null;
     const productId = req.query.productId;
     try {
         const product = Products.findById(productId).populate('likes', 'name');
