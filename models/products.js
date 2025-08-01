@@ -108,7 +108,11 @@ const ProductsSchema = new mongoose.Schema({
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
-    }]
+    }],
+    views:{
+        type: Number,
+        default:0
+    }
 }, {
     timestamps: true
 });

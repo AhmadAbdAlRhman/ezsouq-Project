@@ -16,44 +16,6 @@ module.exports.getAllCategories = async (_req, res) => {
     });
 };
 
-module.exports.getAllSortedProducts = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 6;
-        const skip = (page - 1) * limit;
-        const sortField = req.query.sortBy || 'createdAt';
-        const order = req.query.order === 'desc' ? -1 : 1;
-        const total = await Products.countDocuments();
-        await Products.find()
-            .populate(
-                'Owner_id', 'name avatar phone'
-            )
-            // .populate('Governorates_id')
-            .sort({
-                [sortField]: order
-            })
-            .skip(skip)
-            .limit(limit)
-            .then(async (products) => {
-                return res.status(200).json({
-                    currentPage: page,
-                    totalPages: Math.ceil(total / limit),
-                    totalItems: total,
-                    items: products
-                });
-            }).catch((err) => {
-                return res.status(500).json({
-                    message: err.message
-                })
-            })
-    } catch (err) {
-        res.status(500).json({
-            message: "حدث خطأ أثناء جلب المنتجات",
-            error: err.message
-        });
-    }
-}
-
 module.exports.getFilteredProducts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -124,17 +86,14 @@ module.exports.addProduct = async (req, res) => {
             storage
         } = req.body;
 
-        // تحقق من الحقول الأساسية
         if (!name || !Category_name || !Governorate_name || !city || !price) {
             return res.status(400).json({
                 message: "الرجاء تعبئة جميع الحقول الأساسية."
             });
         }
-        // رفع الصور والفيديو
         const mainPhotos = req.files ?. ['main_photos'] ?.map(file => file.filename) || [];
         const optionalPhotos = req.files ?. ['photos'] ?.map(file => file.filename) || [];
         const video = req.files ?. ['video'] ?. [0] ?.filename || null;
-        // تحقق من عدد الصور الأساسية
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
                 message: 'يجب رفع 3 صور أساسية تماماً.',
@@ -302,6 +261,29 @@ module.exports.toggleFavorite = async (req, res) => {
     }
 }
 
+module.exports.getAllwishes = async (req, res) => {
+    const user_id = req.user.id;
+    await User.findById(user_id)
+        .select('favorites')
+        .populate('favorites', '_id name main_photos').then((user) => {
+            if (!user)
+                return res.status(404).json({
+                    message: "المستخدم غير موجود"
+                });
+            const favorites = user.favorites;
+            const favoritesCount = favorites.length;
+            res.status(200).json({
+                count: favoritesCount,
+                favorites: favorites
+            });
+        }).catch((err) => {
+            res.status(500).json({
+                message: "حدث خطأ أثناء جلب العناصر المفضلة",
+                error: err.message
+            });
+        });
+}
+
 module.exports.toggleLike = async (req, res) => {
     try {
         const user_id = req.user.id;
@@ -357,25 +339,31 @@ module.exports.getAllLikes = async (req, res) => {
         })
 }
 
-module.exports.getAllwishes = async (req, res) => {
-    const user_id = req.user.id;
-    await User.findById(user_id)
-        .select('favorites')
-        .populate('favorites', '_id name main_photos').then((user) => {
-            if (!user)
-                return res.status(404).json({
-                    message: "المستخدم غير موجود"
-                });
-            const favorites = user.favorites;
-            const favoritesCount = favorites.length;
-            res.status(200).json({
-                count: favoritesCount,
-                favorites: favorites
+module.exports.setViews = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const product = await Products.findByIdAndUpdate(
+            productId, {
+                $inc: {
+                    views: 1
+                }
+            }, {
+                new: true
+            }
+        )
+        if(!product){
+            return res.status(400).json({
+                message:"المنتج غير موجود"
             });
-        }).catch((err) => {
-            res.status(500).json({
-                message: "حدث خطأ أثناء جلب العناصر المفضلة",
-                error: err.message
-            });
+        }
+        res.status(200).json({
+            message:"تم زيادة عدد المشاهدة بنجاح",
+            views:product.views
         });
+    } catch (err) {
+        res.status(500).json({
+            message:"حدث خطأ أثناء زيادة عدد المشاهدة",
+            Error: err.message
+        })
+    }
 }

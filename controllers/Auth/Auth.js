@@ -1,4 +1,5 @@
 const User = require("../../models/email_user");
+const Likes = require("../../models/Likes");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
 const {
@@ -55,13 +56,16 @@ module.exports.register = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
-        const { error } = loginSchema.validate(req.body);
+        const {
+            error
+        } = loginSchema.validate(req.body);
         if (error) {
             return res.status(400).json({
                 status: 'fail',
                 message: error.details[0].message
             });
         }
+
         const {
             email,
             password
@@ -78,11 +82,17 @@ module.exports.login = async (req, res) => {
                 message: "كلمة المرور غير صحيحة"
             });
         }
+        const likes = await Likes.find({
+            user: user._id
+        }).populate("product");
         res.json({
             message: "تم تسجيل الدخول بنجاح",
-            _id: user._id,
-            name: user.name,
-            Role: user.Role,
+            user: {
+                _id: user._id,
+                name: user.name,
+                Role: user.Role,
+            },
+            likedProducts: likes.map((like) => like.product),
             token: generateToken(user)
         });
     } catch (err) {
