@@ -322,7 +322,7 @@ module.exports.getAllLikes = async (req, res) => {
     let currentUserIsLike = null;
     const productId = req.query.productId;
     try {
-        const product = Products.findById(productId).populate('likes', 'name');
+        const product = await Products.findById(productId).populate('likes', 'name');
         if (!product)
             return res.status(404).json({
         message: "المنتج غير موجود حالياً."
