@@ -319,7 +319,7 @@ module.exports.toggleLike = async (req, res) => {
 
 module.exports.getAllLikes = async (req, res) => {
     const productId = req.query.productId;
-    const user_id = req.body.user_id;
+    const userId = req.user?.id;
     try {
         const product = await Products.findById(productId).populate('likes', 'name');
         if (!product)
@@ -328,12 +328,9 @@ module.exports.getAllLikes = async (req, res) => {
     });
     const likesCount = product.likes.length;
     const likers = product.likes.map(user => user.name);
-    let currentUserIsLike = false;
-    if (user_id){
-        currentUserIsLike = product.likes.some(
-            user => user._id.toString() === user_id.toString()
-        );
-    }
+    const currentUserIsLike = userId
+            ? product.likes.some(user => user._id.toString() === userId.toString())
+            : false;
         return res.status(200).json({
             count: likesCount,
             users: likers,
