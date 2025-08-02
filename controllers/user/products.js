@@ -329,8 +329,8 @@ module.exports.getAllLikes = async (req, res) => {
     });
     const likesCount = product.likes.length;
     const likers = product.likes.map(user => user.name);
-    if (req.user){
-        userid = req.user.id;
+    if (req.body.user_id){
+        userid = req.body.user_id;
         currentUserIsLike = product.likes.some(
             user => user._id.toString() === userid.toString()
         );
