@@ -1,0 +1,17 @@
+const swaggerAutogen = require('swagger-autogen')();
+
+const doc = {
+    info: {
+        title: 'Ezsouq Project',
+        description: 'API Documentation',
+    },
+    host: 'localhost:3010',
+    schemes: ['http'],
+};
+
+const outputFile = './swagger-output.json';
+const endpointsFiles = ['./server.js'];
+
+swaggerAutogen(outputFile, endpointsFiles, doc).then(()=>{
+    require('./server');
+})
