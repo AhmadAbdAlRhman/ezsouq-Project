@@ -5,8 +5,8 @@ const doc = {
         title: 'Ezsouq Project',
         description: 'API Documentation',
     },
-    host: 'localhost:3010',
-    schemes: ['http'],
+    host: 'api.ezsouq.store',
+    schemes: ['https'],
 };
 
 const outputFile = './swagger-output.json';
