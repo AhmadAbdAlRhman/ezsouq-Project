@@ -1,5 +1,4 @@
 const User = require("../../models/email_user");
-const Likes = require("../../models/Likes");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
 const {
@@ -82,9 +81,6 @@ module.exports.login = async (req, res) => {
                 message: "كلمة المرور غير صحيحة"
             });
         }
-        const likes = await Likes.find({
-            user: user._id
-        }).populate("product");
         res.json({
             message: "تم تسجيل الدخول بنجاح",
             user: {
