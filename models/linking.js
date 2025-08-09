@@ -11,4 +11,3 @@ require('./Governorates');
 require('./products');
 require('./feedback');
 require('./Report');
-require('./Likes');
