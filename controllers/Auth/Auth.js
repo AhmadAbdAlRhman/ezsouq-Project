@@ -88,7 +88,6 @@ module.exports.login = async (req, res) => {
                 name: user.name,
                 Role: user.Role,
             },
-            likedProducts: likes.map((like) => like.product),
             token: generateToken(user)
         });
     } catch (err) {
