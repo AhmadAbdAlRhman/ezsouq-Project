@@ -98,7 +98,7 @@ module.exports.ratingPublisher = async (req, res) => {
 
 }
 
-module.exports.getProdUser = async (req, res, next) => {
+module.exports.getProdUser = async (req, res) => {
     try{
         const user_id = req.params.user_id;
         if (!mongoose.Types.ObjectId.isValid(user_id))
@@ -122,7 +122,7 @@ module.exports.getProdUser = async (req, res, next) => {
         res.status(200).json(products);
     }
     catch(err){
-        console.error(error);
+        console.error(err);
         res.status(500).json({ message: "حدث خطأ في السيرفر" });
     }
 }
