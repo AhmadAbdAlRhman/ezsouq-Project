@@ -111,8 +111,6 @@ module.exports.getProdUser = async (req, res) => {
                 Owner_id: user_id
             })
             .populate('Owner_id', 'name email Location workplace work_type whats_app averageRating')
-            .populate('Category_name')
-            .populate('Governorate_name')
         ]);
         if (!userExists) {
             return res.status(404).json({
