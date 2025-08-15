@@ -1,4 +1,5 @@
 const User = require('../../models/users');
+const Product = require('../../models/products');
 const mongoose = require('mongoose');
 
 module.exports.getInfoUser = async (req, res) => {
@@ -97,3 +98,31 @@ module.exports.ratingPublisher = async (req, res) => {
 
 }
 
+module.exports.getProdUser = async (req, res, next) => {
+    try{
+        const user_id = req.params.user_id;
+        if (!mongoose.Types.ObjectId.isValid(user_id))
+            return res.status(400).json({
+                message: "معرّف غير صالح"
+            });
+        const [userExists, products] = await Promise.all([
+            User.findById(user_id),
+            Product.find({
+                Owner_id: user_id
+            })
+            .populate('Owner_id', 'name email Location workplace work_type whats_app averageRating')
+            .populate('Category_name')
+            .populate('Governorate_name')
+        ]);
+        if (!userExists) {
+            return res.status(404).json({
+                message: "المستخدم غير موجود"
+            });
+        }
+        res.status(200).json(products);
+    }
+    catch(err){
+        console.error(error);
+        res.status(500).json({ message: "حدث خطأ في السيرفر" });
+    }
+}
