@@ -33,7 +33,7 @@ router.get('/all_comments/:product_id', feedback.getAllCommentForProduct);
 router.delete('/delete_comment/:comment_id', protect, feedback.deleteComment);
 router.put('/update_comment/:comment_id', protect, feedback.updateComments);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-router.get('/get_user/:user_id', user.getOneUser);
+router.get('/get_user/:user_id', user.getInfoUser);
 router.put('/update_information', protect, user.updateInformationUser);
 router.post('/rating_publisher', protect, user.ratingPublisher);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
