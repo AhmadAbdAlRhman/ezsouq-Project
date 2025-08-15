@@ -348,19 +348,18 @@ module.exports.getAllLikes = async (req, res) => {
 module.exports.setViews = async (req, res) => {
     try {
         const productId = req.params.productId;
-        const product = await Products.findByIdAndUpdate(
-            productId, {
-                $inc: {
-                    views: 1
-                }
-            }, {
-                new: true
-            }
-        )
+        const userId = req.user.id;
+
+        const product = await Products.findById(productId)
         if (!product) {
             return res.status(400).json({
                 message: "المنتج غير موجود"
             });
+        }
+        if (!product.viewedBy.includes(userId)) {
+            product.views += 1;
+            product.viewedBy.push(userId);
+            await product.save();
         }
         res.status(200).json({
             message: "تم زيادة عدد المشاهدة بنجاح",

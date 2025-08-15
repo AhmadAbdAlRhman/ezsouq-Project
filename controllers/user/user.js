@@ -8,7 +8,7 @@ module.exports.getInfoUser = async (req, res) => {
         return res.status(400).json({
             message: "معرّف غير صالح"
         });
-    await User.findById(user_id).select('_id name email Role Location workplace work_type whats_app averageRating').then((user) => {
+    await User.findById(user_id).select('_id name email Role Location workplace work_type whats_app phone averageRating').then((user) => {
         if (!user)
             return res.status(404).json({
                 message: "لا يوجد مثل هذا المستخدم"
