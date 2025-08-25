@@ -13,52 +13,97 @@ module.exports.comment = async (req, res) => {
         comments,
         user_id,
         product_id,
-        parent_comment : parent_comment || null
+        parent_comment: parent_comment || null
     });
     await newFeedback.save().then(() => {
         res.status(201).json(newFeedback);
     }).catch((err) => {
         res.status(500).json({
             message: 'حدث خطأ أثناء إضافة التعليق',
-            err
+            Error: err.message
         });
     });
 }
 
 module.exports.getAllCommentForProduct = async (req, res) => {
-    const product_id = req.params.product_id;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
-    const skip = (page - 1) * limit;
-    const productObjectId = new mongoose.Types.ObjectId(product_id);
-    const total = await Feedback.countDocuments({
-        product_id: product_id
-    });
-    await Feedback.find({
-            product_id: productObjectId
-        })
-        .populate('user_id', 'name avatar')
-        .populate('product_id', 'id name')
-        .populate('parent_comment' , 'comments')
-        .sort({
-            createdAt: -1
-        })
-        .skip(skip)
-        .limit(limit)
-        .then((feedbacks) => {
-            res.status(200).json({
-                total,
-                page,
-                pages: Math.ceil(total / limit),
-                count: feedbacks.length,
-                feedbacks,
-            });
-        }).catch((err) => {
-            res.status(500).json({
-                message: 'حدث خطأ أثناء جلب التعليقات',
-                Error: err.message
-            });
+    try {
+        const product_id = req.params.product_id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+        const productObjectId = new mongoose.Types.ObjectId(product_id);
+        const total = await Feedback.countDocuments({
+            product_id: product_id,
+            parent_comment: null
         });
+        const feedbacks = await Feedback.aggregate([{
+                $match: {
+                    product_id: productObjectId,
+                    parent_comment: null
+                }
+            },
+            {
+                $lookup: {
+                    from: "feedback",
+                    let: {
+                        commentId: "$_id"
+                    },
+                    pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $eq: ["$parent_comment", "$$commentId"]
+                                }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "Users",
+                                localField: "user_id",
+                                foreignField: "_id",
+                                as: "user"
+                            }
+                        }, {
+                            $unwind: "$user"
+                        }
+                    ],
+                    as: "replies"
+                }
+            },
+            {
+                $lookup: {
+                    from: "Users",
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            }, {
+                $unwind: "$user"
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
+        ]);
+        res.status(200).json({
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+            count: feedbacks.length,
+            feedbacks,
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'حدث خطأ أثناء جلب التعليقات',
+            Error: err.message
+        });
+    };
 }
 
 module.exports.deleteComment = async (req, res) => {
@@ -107,4 +152,15 @@ module.exports.updateComments = async (req, res) => {
             err
         });
     });
+}
+
+module.exports.getOneComment = async (req, res) => {
+    try {
+
+    } catch (err) {
+        res.status(500).json({
+            message: "حدث خطأ",
+            Error: err.message
+        })
+    }
 }

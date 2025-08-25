@@ -1,6 +1,6 @@
 const multer = require("multer");
-const storage = require("../functions/storage");
-const fileFilter = require("../validation/fileFilter");
+const {storage, storageuser} = require("../functions/storage");
+const {fileFilter, userFilter} = require("../validation/fileFilter");
 
 
 const upload = multer({
@@ -10,5 +10,12 @@ const upload = multer({
         fileSize: 200 * 1024 * 1024
     }
 });
+const uploadimage = multer({
+    storage: storageuser,
+    fileFilter: userFilter,
+    limits: {
+        fileSize: 200 * 1024 * 1024
+    }
+});
 
-module.exports = upload;
+module.exports = {upload, uploadimage};

@@ -120,3 +120,7 @@ module.exports.update_reporte = async (req, res) => {
         })
     }
 }
+
+module.exports.search_about_Report = async (req, res) => {
+    
+}

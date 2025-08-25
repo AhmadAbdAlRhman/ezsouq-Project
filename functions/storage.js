@@ -16,4 +16,13 @@ const storage = multer.diskStorage({
     }
 });
 
-module.exports = storage;
+const storageuser = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/users"); // مكان الحفظ
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // اسم فريد للملف
+    }
+});
+
+module.exports = {storage, storageuser};

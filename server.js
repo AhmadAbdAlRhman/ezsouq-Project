@@ -9,6 +9,7 @@ app.use(cors({
 }));
 app.use('/uploads/images', express.static('uploads/images'));
 app.use('/uploads/videos', express.static('uploads/videos'));
+app.use('/uploads/users', express.static('uploads/users'));
 require('./models/linking');
 app.use(express.json());
 const auth = require("./routes/Authintication");

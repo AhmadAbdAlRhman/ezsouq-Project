@@ -5,7 +5,7 @@ const products = require('../controllers/user/products');
 const user = require('../controllers/user/user');
 const feedback = require('../controllers/user/Feedback');
 const report = require('../controllers/user/Reported');
-const upload = require('../middleware/upload_files');
+const {upload, uploadimage} = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 const checkRole = require('../middleware/checkRole');
 
@@ -37,6 +37,7 @@ router.get('/get_user/:user_id', user.getInfoUser);
 router.get('/get_product_user/:user_id', user.getProdUser);
 router.put('/update_information', protect, user.updateInformationUser);
 router.post('/rating_publisher', protect, user.ratingPublisher);
+router.put('/photo', protect, uploadimage.single("avatar"),user.addPhoto);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,

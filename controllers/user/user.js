@@ -99,7 +99,7 @@ module.exports.ratingPublisher = async (req, res) => {
 }
 
 module.exports.getProdUser = async (req, res) => {
-    try{
+    try {
         const user_id = req.params.user_id;
         if (!mongoose.Types.ObjectId.isValid(user_id))
             return res.status(400).json({
@@ -118,9 +118,35 @@ module.exports.getProdUser = async (req, res) => {
             });
         }
         res.status(200).json(products);
-    }
-    catch(err){
+    } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "حدث خطأ في السيرفر" });
+        res.status(500).json({
+            message: "حدث خطأ في السيرفر"
+        });
+    }
+}
+
+module.exports.addPhoto = async(req, res) => {
+    try {
+        const userId = req.user.id;
+        if (!req.file) {
+            return res.status(400).json({ message: "الرجاء رفع صورة" });
+        }
+
+        const photoUrl = `/uploads/users/${req.file.filename}`;
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { avatar: photoUrl },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "تم تحديث صورة البروفايل بنجاح ✅",
+            user
+        });
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({ message: "خطأ أثناء رفع الصورة", Error:error.message });
     }
 }
