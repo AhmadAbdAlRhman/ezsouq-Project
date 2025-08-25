@@ -49,24 +49,24 @@ module.exports.getAllCommentForProduct = async (req, res) => {
                         commentId: "$_id"
                     },
                     pipeline: [{
-                            $match: {
-                                $expr: {
-                                    $eq: ["$parent_comment", "$$commentId"]
-                                }
+                        $match: {
+                            $expr: {
+                                $eq: ["$parent_comment", "$$commentId"]
                             }
                         },
-                        {
-                            $lookup: {
-                                from: "Users",
-                                localField: "user_id",
-                                foreignField: "_id",
-                                as: "user"
-                            }
-                        }, {
-                            $unwind: "$user"
-                        }
-                    ],
-                    as: "replies"
+                    }, {
+                        $count: "count"
+                    }],
+                    as: "repliesCount"
+                }
+            },
+            {
+                $addFields: {
+                    repliesCount: {
+                        $ifNull: [{
+                            $arrayElemAt: ["$repliesCount.count", 0]
+                        }, 0]
+                    }
                 }
             },
             {
