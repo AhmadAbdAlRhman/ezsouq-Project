@@ -39,6 +39,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
         const feedbacks = await Feedback.aggregate([{
                 $match: {
                     product_id: productObjectId,
+                    parent_comment: null
                 }
             },
             {
