@@ -33,7 +33,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
         const skip = (page - 1) * limit;
         const productObjectId = new mongoose.Types.ObjectId(product_id);
         const total = await Feedback.countDocuments({
-            product_id: product_id,
+            product_id: productObjectId,
             parent_comment: null
         });
         const feedbacks = await Feedback.aggregate([{
