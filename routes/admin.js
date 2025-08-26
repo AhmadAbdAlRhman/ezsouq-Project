@@ -5,6 +5,7 @@ const protect = require('../middleware/OAtuh');
 const Governorates = require('../controllers/admin/Governorates');
 const products = require('../controllers/admin/Products');
 const Users = require('../controllers/admin/users');
+const statistics = require('../controllers/admin/statistics');
 const report = require('../controllers/user/Reported');
 //إضافة محافظة مع المدن التابعة لها
 router.post('/add_governorates', protect, checkRole(['ADMIN', 'OWNER']), Governorates.addGovernorates);
@@ -24,4 +25,6 @@ router.get('/all_reports', protect, checkRole(['ADMIN', 'OWNER']), report.get_al
 router.get('/get_all_users', protect, checkRole(['OWNER']), Users.getAllUser);
 //admin عرض جميع المستخدمين ال عادريين  
 router.get('/get_users', protect, checkRole(['ADMIN']), Users.getUser);
+//عرض الإحصائيات
+router.get('/statistics', statistics.getStatistics);
 module.exports = router;
