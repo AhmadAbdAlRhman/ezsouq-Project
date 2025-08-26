@@ -151,7 +151,7 @@ module.exports.getOneProduct = async (req, res) => {
     await Products.findById(
             pro_id
         )
-        .populate('Owner_id', 'name avatar phone')
+        .populate('Owner_id', 'name avatar phone averageRating')
         .then((pro) => {
             if (!pro)
                 return res.status(404).json({
