@@ -44,7 +44,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "feedback",
+                    from: "feedbacks",
                     let: {
                         commentId: "$_id"
                     },
@@ -71,7 +71,7 @@ module.exports.getAllCommentForProduct = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "Users",
+                    from: "users",
                     localField: "user_id",
                     foreignField: "_id",
                     as: "user"
