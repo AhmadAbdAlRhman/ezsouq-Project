@@ -26,5 +26,5 @@ router.get('/get_all_users', protect, checkRole(['OWNER']), Users.getAllUser);
 //admin عرض جميع المستخدمين ال عادريين  
 router.get('/get_users', protect, checkRole(['ADMIN']), Users.getUser);
 //عرض الإحصائيات
-router.get('/statistics', protect, checkRole(['OWNER, ADMIN']), statistics.getStatistics);
+router.get('/statistics', protect, checkRole(['OWNER', 'ADMIN']), statistics.getStatistics);
 module.exports = router;
