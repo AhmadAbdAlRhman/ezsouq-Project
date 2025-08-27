@@ -265,7 +265,7 @@ module.exports.getAllwishes = async (req, res) => {
     const user_id = req.user.id;
     await User.findById(user_id)
         .select('favorites')
-        .populate('favorites', '_id name main_photos price').then((user) => {
+        .populate('favorites', '_id name main_photos price Category_name Governorate_name city createdAt').then((user) => {
             if (!user)
                 return res.status(404).json({
                     message: "المستخدم غير موجود"
