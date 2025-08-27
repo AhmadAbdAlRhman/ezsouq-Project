@@ -30,6 +30,7 @@ router.delete('/delete_report/:reporteId', protect, report.delete_reporte);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/comment', protect, feedback.comment);
 router.get('/all_comments/:product_id', feedback.getAllCommentForProduct);
+router.get('/one_comment/:comment_id', feedback.getOneComment);
 router.delete('/delete_comment/:comment_id', protect, feedback.deleteComment);
 router.put('/update_comment/:comment_id', protect, feedback.updateComments);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_

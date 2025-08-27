@@ -156,7 +156,24 @@ module.exports.updateComments = async (req, res) => {
 
 module.exports.getOneComment = async (req, res) => {
     try {
+        const comment_id = req.params.commentId;
+        const comment = await Feedback.findById(comment_id)
+            .populate('user_id', 'name email')
+            .populate({
+                path: 'replies',
+                populate: {
+                    path: 'user_id',
+                    select: '_id name email'
+                }
+            });
 
+        if (!comment) {
+            return res.status(404).json({
+                message: 'Comment not found'
+            });
+        }
+
+        res.status(200).json(comment);
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ",

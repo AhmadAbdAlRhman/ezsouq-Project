@@ -22,5 +22,14 @@ const feedbackSchema = new mongoose.Schema({
         default: null
     }
 }, { timestamps: true });
+
+feedbackSchema.virtual('replies', {
+    ref: 'feedback',
+    localField: '_id',
+    foreignField: 'parent_comment'
+});
+
+feedbackSchema.set('toObject', { virtuals: true });
+feedbackSchema.set('toJSON', { virtuals: true });
 const Feedback = mongoose.model("feedback",feedbackSchema);
 module.exports = Feedback;
