@@ -57,10 +57,10 @@ module.exports.checkCode = async (req, res) => {
 }
 //This is for change password from mobile
 module.exports.changePassword = async (req, res) => {
-    const id = req.body.id;
+    const code = req.body.code;
     const newPassword = req.body.newpassword;
     await User.findOne({
-        _id: id
+        resetToken: code
     }).then(async (user) => {
         if (!user)
             return res.status(404).json({
