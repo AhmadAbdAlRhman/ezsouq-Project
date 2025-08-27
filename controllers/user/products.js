@@ -324,13 +324,13 @@ module.exports.getAllLikes = async (req, res) => {
         const product = await Products.findById(productId).populate('likes', 'name');
         if (!product)
             return res.status(404).json({
-        message: "المنتج غير موجود حالياً."
-    });
-    const likesCount = product.likes.length;
-    const likers = product.likes.map(user => user.name);
-    const currentUserIsLike = userId
-            ? product.likes.some(user => user._id.toString() === userId.toString())
-            : false;
+                message: "المنتج غير موجود حالياً."
+            });
+        const likesCount = product.likes.length;
+        const likers = product.likes.map(user => user.name);
+        const currentUserIsLike = userId ?
+            product.likes.some(user => user._id.toString() === userId.toString()) :
+            false;
         return res.status(200).json({
             count: likesCount,
             users: likers,
@@ -368,6 +368,27 @@ module.exports.setViews = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ أثناء زيادة عدد المشاهدة",
+            Error: err.message
+        })
+    }
+}
+
+module.exports.deleteProduct = async (req, res) => {
+    try {
+        const product_id = req.params.productId;
+        const product = await Products.findByIdAndDelete(product_id);
+        if (!product) {
+            res.status(404).json({
+                message: "لم يتم العثور على المنتج"
+            });
+        }
+        res.status(200).json({
+            message: "تم حذف المنتج بنجاح",
+            Result: product
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "حدث خطأ أثناء حذف المنتج",
             Error: err.message
         })
     }
