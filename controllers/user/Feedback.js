@@ -156,7 +156,7 @@ module.exports.updateComments = async (req, res) => {
 
 module.exports.getOneComment = async (req, res) => {
     try {
-        const comment_id = req.params.commentId;
+        const comment_id = req.params.comment_id;
         const Id = new mongoose.Types.ObjectId(comment_id);
         const comment = await Feedback.findById(Id)
             .populate('user_id', 'name email')
