@@ -22,7 +22,7 @@ router.get('/get_all_wishes',protect, products.getAllwishes)
 router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
 router.put('/set_count_views/:productId',protect, products.setViews);
-router.put('/delete_product/:productId',protect, products.deleteProduct);
+router.delete('/delete_product/:productId',protect, products.deleteProduct);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/report', protect, report.reportProducts);
 router.get('/get_one_report/:reporteId', protect, report.get_one_reporte);

@@ -383,8 +383,7 @@ module.exports.deleteProduct = async (req, res) => {
             });
         }
         res.status(200).json({
-            message: "تم حذف المنتج بنجاح",
-            Result: product
+            message: "تم حذف المنتج بنجاح"
         })
     } catch (err) {
         res.status(500).json({
