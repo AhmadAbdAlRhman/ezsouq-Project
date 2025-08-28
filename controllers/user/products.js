@@ -28,28 +28,70 @@ module.exports.getFilteredProducts = async (req, res) => {
             filter.Governorate_name = req.query.governorates;
         if (req.query.Category)
             filter.Category_name = req.query.Category;
-        const total = await Products.countDocuments(filter);
+        // const total = await Products.countDocuments(filter);
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
-        await Products.find(filter)
-            .populate('Owner_id', 'name avatar phone whats_app averageRating')
-            .sort({
-                [sortField]: order
-            })
-            .skip(skip)
-            .limit(limit)
-            .then(async (products) => {
+
+        const pipeline = [
+            {$match: filter},
+            {
+                $lookup:{
+                    from: "users",
+                    localField: "Owner_id",
+                    foreignField: "_id",
+                    as: "Owner"
+                }
+            },
+            {
+                $unwind: "$Owner"
+            },
+            {
+                $lookup:{
+                    from: "feedbacks",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "comments"
+                }
+            },
+            {
+                $addFields: {
+                    commentsCount: {$size: "$comments"}
+                }
+            },
+            {
+                $project: {
+                    comments: 0,
+                    "Owner.password": 0,
+                    "Owner.email": 0,
+                    "Owner.favorites": 0,
+                    "Owner.ratings": 0
+                }
+            },
+            { $sort: { [sortField]: order } },
+            { $skip: skip },
+            { $limit: limit }
+        ];
+        const products = await Products.aggregate(pipeline);
+        const total = await Products.countDocuments(filter);
+        // await Products.find(filter)
+        //     .populate('Owner_id', 'name avatar phone whats_app averageRating')
+        //     .sort({
+        //         [sortField]: order
+        //     })
+        //     .skip(skip)
+        //     .limit(limit)
+        //     .then(async (products) => {
                 return res.status(200).json({
                     currentPage: page,
                     totalPages: Math.ceil(total / limit),
                     totalItems: total,
                     items: products
                 });
-            }).catch((err) => {
-                return res.status(500).json({
-                    message: err.message
-                })
-            })
+            // }).catch((err) => {
+            //     return res.status(500).json({
+            //         message: err.message
+            //     })
+            // })
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ أثناء جلب المنتجات",
