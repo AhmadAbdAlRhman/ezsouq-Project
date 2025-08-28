@@ -21,10 +21,12 @@ router.delete('/Delet_User', protect, checkRole(['OWNER']), Users.DeleteUser);
 router.post('/add_category', protect, checkRole(['ADMIN', 'OWNER']), products.addCtegory);
 //عرض التقراير
 router.get('/all_reports', protect, checkRole(['ADMIN', 'OWNER']), report.get_all_reportedProducts);
-//admin عرض جميع المستخدمين ال عادريين وال 
+//admin عرض جميع المستخدمين ال عادريين وال
 router.get('/get_all_users', protect, checkRole(['OWNER']), Users.getAllUser);
-//admin عرض جميع المستخدمين ال عادريين  
+//admin عرض جميع المستخدمين ال عادريين
 router.get('/get_users', protect, checkRole(['ADMIN']), Users.getUser);
 //عرض الإحصائيات
 router.get('/statistics', protect, checkRole(['OWNER', 'ADMIN']), statistics.getStatistics);
+// عرض الإحصائيات المنتجات
+router.get('/category_statistics', protect, checkRole(['OWNER', 'ADMIN']), statistics.getStatisticsCategorey);
 module.exports = router;
