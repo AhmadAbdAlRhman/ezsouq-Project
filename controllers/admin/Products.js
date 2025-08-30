@@ -1,5 +1,5 @@
 const Category = require('../../models/Category');
-const Report = require('../../models/Report');
+const Products = require('../../models/products');
 
 module.exports.addCtegory = async (req, res) => {
     try {
@@ -27,5 +27,63 @@ module.exports.addCtegory = async (req, res) => {
             message: "حدث خطأ في السيرفر",
             error: err.message
         });
+    }
+}
+
+module.exports.getTopProducts = async (_req, res) => {
+    try {
+        const topLikedProducts = await Products.aggregate([{
+                $project: {
+                    name: 1,
+                    Owner_id: 1,
+                    main_photo: {
+                        $arrayElemAt: ["$main_photos", 0]
+                    },
+                    views: 1,
+                    totalLikes: {
+                        $size: {
+                            $ifNull: ["$likes", []]
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {
+                    totalLikes: -1
+                }
+            },
+            {
+                $limit: 3
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "Owner_id",
+                    foreignField: "_id",
+                    as: "owner"
+                }
+            },
+            {
+                $unwind: "$owner"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    main_photo: 1,
+                    views: 1,
+                    totalLikes: 1,
+                }
+            }
+        ]);
+
+        res.json({
+            topLikedProducts
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "خطأ أثناء جلب المنتجات",
+            Error: err.message
+        })
     }
 }
