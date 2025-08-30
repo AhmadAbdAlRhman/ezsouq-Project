@@ -1,4 +1,5 @@
 const User = require('../../models/users');
+const Products = require('../../models/products');
 
 module.exports.GrantingPermissions = async (req, res) => {
     const user_id = req.body.user_id;
@@ -84,20 +85,28 @@ module.exports.DeleteUser = async (req, res) => {
 }
 
 module.exports.getAllUser = async (req, res) => {
-    try{
+    try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
         const roleQuery = req.query.role || 'both';
         let roleFilter = {};
         if (roleQuery === 'USER') {
-            roleFilter = { Role: 'USER' };
+            roleFilter = {
+                Role: 'USER'
+            };
         } else if (roleQuery === 'ADMIN') {
-            roleFilter = { Role: 'ADMIN' };
+            roleFilter = {
+                Role: 'ADMIN'
+            };
         } else {
-            roleFilter = { Role: { $in: ['USER', 'ADMIN'] } };
+            roleFilter = {
+                Role: {
+                    $in: ['USER', 'ADMIN']
+                }
+            };
         }
-        const filter = roleFilter ;
+        const filter = roleFilter;
         const [users, total] = await Promise.all([
             User.find(filter).skip(skip).limit(limit),
             User.countDocuments(filter)
@@ -109,18 +118,23 @@ module.exports.getAllUser = async (req, res) => {
             totalPages,
             totalItems: total,
         });
-    }catch(err){
+    } catch (err) {
         console.error('Error getting users:', err);
-        return res.status(500).json({ message: 'فشل في جلب المستخدمين', error: err.message });
+        return res.status(500).json({
+            message: 'فشل في جلب المستخدمين',
+            error: err.message
+        });
     }
 
 }
 module.exports.getUser = async (req, res) => {
-    try{
+    try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
-        const filter = { Role: 'USER' };
+        const filter = {
+            Role: 'USER'
+        };
         const [users, total] = await Promise.all([
             User.find(filter).skip(skip).limit(limit),
             User.countDocuments(filter)
@@ -132,9 +146,55 @@ module.exports.getUser = async (req, res) => {
             totalPages,
             totalItems: total,
         });
-    }catch(err){
+    } catch (err) {
         console.error('Error getting users:', err);
-        return res.status(500).json({ message: 'فشل في جلب المستخدمين', error: err.message });
+        return res.status(500).json({
+            message: 'فشل في جلب المستخدمين',
+            error: err.message
+        });
     }
 
+}
+
+module.exports.getTopUser = async (_req, res) => {
+    try {
+        const topUsers = await Products.aggregate([
+            {
+                $group: {
+                    _id: "$Owner_id",
+                    totalProducts: {
+                        $sum: 1
+                    }
+                }
+            },
+            { $sort: {totalProducts: -1}},
+            {$limit: 2},
+            {
+                $lookup:{
+                    from:"users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            { $unwind: "$user"},
+            {
+                $project: {
+                    _id: 0,
+                    userId: "$user._id",
+                    userName: "$user.name",
+                    avatar: "$user.avatar",
+                    email: "$user.eamil",
+                    phone: "$user.phone",   
+                    totalProducts: 1
+                }
+            }
+        ]);
+        res.status(200).json({topUsers});
+    } catch (err) {
+        res.status(500).json({
+            message: "مستخدمين TOP حدث خطأ أثناء جلب ",
+            Error: err.message
+        })
+    }
 }

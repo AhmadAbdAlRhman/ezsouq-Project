@@ -29,4 +29,6 @@ router.get('/get_users', protect, checkRole(['ADMIN']), Users.getUser);
 router.get('/statistics', protect, checkRole(['OWNER', 'ADMIN']), statistics.getStatistics);
 // عرض الإحصائيات المنتجات
 router.get('/category_statistics', protect, checkRole(['OWNER', 'ADMIN']), statistics.getStatisticsCategorey);
+// مستخدمين TOP عرض 
+router.get('/top_users', protect, checkRole(['ADMIN', 'OWNER']), Users.getTopUser);
 module.exports = router;

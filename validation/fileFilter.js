@@ -11,9 +11,10 @@ const fileFilter = (_req, file, cb) => {
 }
 
 const userFilter = (req, file, cb) => {
+    const allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.svg', '.webp', '.heif', '.avif'];
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/svg+xml', 'image/webp', 'image/heif', 'image/avif', 'image/jpg'];
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const extname = allowedExtensions.includes(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.includes(file.mimetype);
 
     if (extname && mimetype) {
         cb(null, true);

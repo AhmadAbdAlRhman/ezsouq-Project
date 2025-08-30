@@ -32,10 +32,11 @@ module.exports.getFilteredProducts = async (req, res) => {
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
 
-        const pipeline = [
-            {$match: filter},
+        const pipeline = [{
+                $match: filter
+            },
             {
-                $lookup:{
+                $lookup: {
                     from: "users",
                     localField: "Owner_id",
                     foreignField: "_id",
@@ -46,7 +47,7 @@ module.exports.getFilteredProducts = async (req, res) => {
                 $unwind: "$Owner"
             },
             {
-                $lookup:{
+                $lookup: {
                     from: "feedbacks",
                     localField: "_id",
                     foreignField: "product_id",
@@ -55,7 +56,9 @@ module.exports.getFilteredProducts = async (req, res) => {
             },
             {
                 $addFields: {
-                    commentsCount: {$size: "$comments"}
+                    commentsCount: {
+                        $size: "$comments"
+                    }
                 }
             },
             {
@@ -67,31 +70,26 @@ module.exports.getFilteredProducts = async (req, res) => {
                     "Owner.ratings": 0
                 }
             },
-            { $sort: { [sortField]: order } },
-            { $skip: skip },
-            { $limit: limit }
+            {
+                $sort: {
+                    [sortField]: order
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
         ];
         const products = await Products.aggregate(pipeline);
         const total = await Products.countDocuments(filter);
-        // await Products.find(filter)
-        //     .populate('Owner_id', 'name avatar phone whats_app averageRating')
-        //     .sort({
-        //         [sortField]: order
-        //     })
-        //     .skip(skip)
-        //     .limit(limit)
-        //     .then(async (products) => {
-                return res.status(200).json({
-                    currentPage: page,
-                    totalPages: Math.ceil(total / limit),
-                    totalItems: total,
-                    items: products
-                });
-            // }).catch((err) => {
-            //     return res.status(500).json({
-            //         message: err.message
-            //     })
-            // })
+        return res.status(200).json({
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalItems: total,
+            items: products
+        });
     } catch (err) {
         res.status(500).json({
             message: "حدث خطأ أثناء جلب المنتجات",
