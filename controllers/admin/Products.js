@@ -87,3 +87,39 @@ module.exports.getTopProducts = async (_req, res) => {
         })
     }
 }
+
+module.exports.DeleteProducts = async (req, res) => {
+    try {
+        const {
+            ids
+        } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({
+                message: "يجب إدخال أرقام التعريف الخاصة بالمنتجات"
+            });
+        }
+        const existingProducts = await Products.find({
+            _id: {
+                $in: ids
+            }
+        });
+
+        if (existingProducts.length === 0) {
+            return res.status(404).json({
+                message: "لم يتم العثور على أي منتجات بهذه الأرقام"
+            });
+        }
+        await Products.deleteMany({
+            _id: {
+                $in: ids
+            }
+        });
+        res.json({
+            message: `${ids.length} products deleted successfully`
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+}

@@ -33,4 +33,6 @@ router.get('/category_statistics', protect, checkRole(['OWNER', 'ADMIN']), stati
 router.get('/top_users', protect, checkRole(['ADMIN', 'OWNER']), Users.getTopUser);
 // منتجات TOP عرض 
 router.get('/top_products', protect, checkRole(['ADMIN', 'OWNER']), products.getTopProducts);
+// حذف المنتحات
+router.delete('/delete_products', protect, checkRole(['ADMIN', 'OWNER']), products.DeleteProducts);
 module.exports = router;
