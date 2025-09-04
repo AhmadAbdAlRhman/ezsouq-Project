@@ -300,7 +300,7 @@ module.exports.toggleFavorite = async (req, res) => {
     }
 }
 
-module.exports.getAllSaved = async (req, res) => {
+module.exports.getAllSaved = async (req, res) => { 
     try {
         const user_id = req.user.id;
         const page = parseInt(req.query.page) || 1;
