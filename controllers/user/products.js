@@ -315,6 +315,7 @@ module.exports.getAllSaved = async (req, res) => {
             });
         }
         const favoritesIds = user.favorites.map(id => new mongoose.Types.ObjectId(id));
+        console.log(user.favorites)
         const favorites = await Products.aggregate([{
                 $match: {
                     _id: {
