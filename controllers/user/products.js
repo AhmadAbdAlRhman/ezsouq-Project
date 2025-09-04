@@ -314,7 +314,7 @@ module.exports.getAllSaved = async (req, res) => {
                 message: "المستخدم غير موجود"
             });
         }
-        const favoritesIds = user.favorites;
+        const favoritesIds = user.favorites.map(id => new mongoose.Types.ObjectId(id));
         const favorites = await Products.aggregate([{
                 $match: {
                     _id: {
@@ -371,7 +371,7 @@ module.exports.getAllSaved = async (req, res) => {
                     Category_name: 1,
                     Governorate_name: 1,
                     city: 1,
-                    creadAt: 1,
+                    createdAt: 1,
                     "Owner._id": 1,
                     "Owner.username": 1,
                     commentsCount: 1,
