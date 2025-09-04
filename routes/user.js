@@ -13,7 +13,7 @@ router.get('/governorates', governorates.getAllgovernorates);
 router.get('/cities/:name', governorates.getAllCities);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/categories', products.getAllCategories);
-router.get('/fliteredProducts', products.getFilteredProducts);
+router.get('/fliteredProducts', products.getAllProducts);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/product/:id', products.getOneProduct);
 router.get('/search_product', products.search);

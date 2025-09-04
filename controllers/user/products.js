@@ -16,7 +16,7 @@ module.exports.getAllCategories = async (_req, res) => {
     });
 };
 
-module.exports.getFilteredProducts = async (req, res) => {
+module.exports.getAllProducts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 6;
