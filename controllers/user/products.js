@@ -28,7 +28,6 @@ module.exports.getAllProducts = async (req, res) => {
             filter.Governorate_name = req.query.governorates;
         if (req.query.Category)
             filter.Category_name = req.query.Category;
-        // const total = await Products.countDocuments(filter);
         const sortField = req.query.sortBy || 'createdAt';
         const order = req.query.order === 'desc' ? -1 : 1;
 
@@ -301,27 +300,109 @@ module.exports.toggleFavorite = async (req, res) => {
     }
 }
 
-module.exports.getAllwishes = async (req, res) => {
-    const user_id = req.user.id;
-    await User.findById(user_id)
-        .select('favorites')
-        .populate('favorites', '_id name main_photos price Category_name Governorate_name city createdAt').then((user) => {
-            if (!user)
-                return res.status(404).json({
-                    message: "المستخدم غير موجود"
-                });
-            const favorites = user.favorites;
-            const favoritesCount = favorites.length;
-            res.status(200).json({
-                count: favoritesCount,
-                favorites: favorites
+module.exports.getAllSaved = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const sortField = req.query.sortBy || 'createdAt';
+        const order = req.query.order === 'asc' ? 1 : -1;
+        const user = await User.findById(user_id).select('favorites');
+        if (!user) {
+            return res.status(404).json({
+                message: "المستخدم غير موجود"
             });
-        }).catch((err) => {
-            res.status(500).json({
-                message: "حدث خطأ أثناء جلب العناصر المفضلة",
-                error: err.message
-            });
+        }
+        const favoritesIds = user.favorites;
+        const favorites = await Products.aggregate([{
+                $match: {
+                    _id: {
+                        $in: favoritesIds
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "Owner_id",
+                    foreignField: "_id",
+                    as: "Owner"
+                }
+            },
+            {
+                $unwind: "$Owner"
+            },
+            {
+                $lookup: {
+                    from: "feedbacks",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "comments"
+                }
+            },
+            {
+                $addFields: {
+                    commentsCount: {
+                        $size: "$comments"
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites",
+                    as: "likedBy"
+                }
+            },
+            {
+                $addFields: {
+                    likesCount: {
+                        $size: "$likedBy"
+                    }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    main_photos: 1,
+                    price: 1,
+                    Category_name: 1,
+                    Governorate_name: 1,
+                    city: 1,
+                    creadAt: 1,
+                    "Owner._id": 1,
+                    "Owner.username": 1,
+                    commentsCount: 1,
+                    likesCount: 1,
+                    views: 1
+                }
+            },
+            {
+                $sort: {
+                    [sortField]: order
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
+        ]);
+        res.status(200).json({
+            currentPage: page,
+            totalPages: Math.ceil(favoritesIds.length / limit),
+            totalItems: favoritesIds.length,
+            items: favorites
         });
+    } catch (err) {
+        res.status(500).json({
+            message: "حدث خطأ أثناء جلب العناصر المفضلة",
+            Error: err.message
+        })
+    }
 }
 
 module.exports.toggleLike = async (req, res) => {

@@ -18,7 +18,7 @@ router.get('/fliteredProducts', products.getAllProducts);
 router.get('/product/:id', products.getOneProduct);
 router.get('/search_product', products.search);
 router.get('/get_all_likes', products.getAllLikes)
-router.get('/get_all_wishes',protect, products.getAllwishes)
+router.get('/get_all_wishes',protect, products.getAllSaved)
 router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
 router.put('/set_count_views/:productId',protect, products.setViews);
