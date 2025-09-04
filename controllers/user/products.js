@@ -372,7 +372,7 @@ module.exports.getAllSaved = async (req, res) => {
                     Governorate_name: 1,
                     city: 1,
                     createdAt: 1,
-                    "Owner._id": 1,
+                    "Owner.name": 1,
                     "Owner.username": 1,
                     commentsCount: 1,
                     likesCount: 1,
