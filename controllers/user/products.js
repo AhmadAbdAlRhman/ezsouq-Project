@@ -210,8 +210,17 @@ module.exports.getOneProduct = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "likes",
+                    foreignField: "_id",
+                    as: "likesUsers"
+                }
+            },
+            {
                 $addFields: {
-                    commentsCount: { $size: "$comments" }
+                    commentsCount: { $size: "$comments" },
+                    likesCount: { $size: "$likesUsers" }
                 }
             },
             {
@@ -220,6 +229,23 @@ module.exports.getOneProduct = async (req, res) => {
                     description: 1,
                     price: 1,
                     commentsCount: 1,
+                    Category_name:1,
+                    Governorate_name,
+                    city:1,
+                    main_photos:1,
+                    video:1,
+                    color:1,
+                    isnew:1,
+                    photos:1,
+                    engine_type:1,
+                    shape:1,
+                    real_estate_type:1,
+                    for_sale:1,
+                    in_Furniture:1,
+                    processor:1,
+                    Sotarge:1,
+                    likes:1,
+                    views:1,
                     "Owner._id": 1,
                     "Owner.name": 1,
                     "Owner.Role": 1,
@@ -231,7 +257,10 @@ module.exports.getOneProduct = async (req, res) => {
                     "Owner.phone": 1,
                     "Owner.whats_app": 1,
                     "Owner.work_type": 1,
-                    "Owner.workplace": 1
+                    "Owner.workplace": 1,
+                    "likesUsers._id": 1,
+                    "likesUsers.name": 1,
+                    "likesUsers.avatar": 1
                 }
                 }
         ]);
