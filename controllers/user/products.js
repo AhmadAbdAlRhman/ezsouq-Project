@@ -299,18 +299,74 @@ module.exports.search = async (req, res) => {
                 }
             ]
         } : {};
-
-        const [products, total] = await Promise.all([
-            Products.find(filter)
-            .populate('Owner_id', 'name avatar phone')
-            .skip(skip)
-            .limit(limit)
-            .exec(),
-            Products.countDocuments(filter)
+        const products = await Products.aggregate([
+            { $match: filter },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "Owner_id",
+                    foreignField: "_id",
+                    as: "Owner"
+                }
+            },
+            { $unwind: "$Owner" },
+            {
+                $lookup: {
+                    from: "feedbacks",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "comments"
+                }
+            },
+            {
+                $addFields: {
+                    commentsCount: { $size: "$comments" }
+                }
+            },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $project: {
+                    name: 1,
+                    description: 1,
+                    price: 1,
+                    Category_name: 1,
+                    Governorate_name: 1,
+                    city: 1,
+                    main_photos: 1,
+                    views: 1,
+                    commentsCount: 1,
+                    video:1,
+                    color:1,
+                    isnew:1,
+                    photos:1,
+                    engine_type:1,
+                    shape:1,
+                    real_estate_type:1,
+                    for_sale:1,
+                    in_Furniture:1,
+                    processor:1,
+                    Sotarge:1,
+                    likes:1,
+                    views:1,
+                    "Owner._id": 1,
+                    "Owner.name": 1,
+                    "Owner.Role": 1,
+                    "Owner.averageRating": 1,
+                    "Owner.createdAt": 1,
+                    "Owner.updatedAt": 1,
+                    "Owner.Location": 1,
+                    "Owner.avatar": 1,
+                    "Owner.phone": 1,
+                    "Owner.whats_app": 1,
+                    "Owner.work_type": 1,
+                    "Owner.workplace": 1,
+                }
+            }
         ]);
-
+        const total = await Products.countDocuments(filter);
         const totalPages = Math.ceil(total / limit);
-
         return res.status(200).json({
             data: products,
             currentPage: page,
