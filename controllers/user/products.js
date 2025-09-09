@@ -230,7 +230,7 @@ module.exports.getOneProduct = async (req, res) => {
                     price: 1,
                     commentsCount: 1,
                     Category_name:1,
-                    Governorate_name,
+                    Governorate_name:1,
                     city:1,
                     main_photos:1,
                     video:1,
