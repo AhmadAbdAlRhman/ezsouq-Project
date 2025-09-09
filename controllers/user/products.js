@@ -187,23 +187,66 @@ module.exports.getOneProduct = async (req, res) => {
         return res.status(400).json({
             message: "معرّف غير صالح"
         });
-    await Products.findById(
-            pro_id
-        )
-        .populate('Owner_id', 'name avatar phone averageRating')
-        .then((pro) => {
-            if (!pro)
-                return res.status(404).json({
-                    message: "لا يوجد مثل هذا المنتج"
-                });
-            return res.status(200).json(pro);
-        }).catch((err) => {
-            res.status(500)
-                .json({
-                    message: "Error Server",
-                    Error: err.details
-                });
-        })
+    try{
+        const product = await Products.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(pro_id) }
+            },
+            {
+                $lookup: {
+                    from: "users",            // اسم الكولكشن تبع المستخدمين
+                    localField: "Owner_id",   // الحقل عند المنتجات
+                    foreignField: "_id",      // الحقل عند users
+                    as: "Owner"
+                }
+            },
+            { $unwind: "$Owner" },
+            {
+                $lookup: {
+                    from: "feedbacks",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "comments"
+                }
+            },
+            {
+                $addFields: {
+                    commentsCount: { $size: "$comments" }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    description: 1,
+                    price: 1,
+                    commentsCount: 1,
+                    "Owner._id": 1,
+                    "Owner.name": 1,
+                    "Owner.Role": 1,
+                    "Owner.averageRating": 1,
+                    "Owner.createdAt": 1,
+                    "Owner.updatedAt": 1,
+                    "Owner.Location": 1,
+                    "Owner.avatar": 1,
+                    "Owner.phone": 1,
+                    "Owner.whats_app": 1,
+                    "Owner.work_type": 1,
+                    "Owner.workplace": 1
+                }
+                }
+        ]);
+
+        if (!product || product.length === 0) {
+            return res.status(404).json({ message: "لا يوجد مثل هذا المنتج" });
+        }
+
+        return res.status(200).json(product[0]);
+    }catch(err){
+        res.status(500).json({
+            message: "حدث خطأ أثناء جلب المنتج الواحد",
+            Error: err.message
+        });
+    }
 }
 module.exports.search = async (req, res) => {
     try {
