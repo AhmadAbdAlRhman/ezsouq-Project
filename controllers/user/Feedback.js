@@ -108,20 +108,26 @@ module.exports.getAllCommentForProduct = async (req, res) => {
 
 module.exports.deleteComment = async (req, res) => {
     const id = req.params.comment_id;
-    await Feedback.findByIdAndDelete(id).then((deleted) => {
-        if (!deleted)
-            return res.status(404).json({
-                message: 'لم يتم العثور على التعليق'
-            });
-        res.status(200).json({
-            message: 'تم حذف التعليق بنجاح'
+    const user_id = req.user.id;
+    try{
+        const deleted =  Feedback.findByIdAndDelete(
+        {
+            _id: id,
+            user_id: user_id
+        })
+    if (!deleted)
+        return res.status(404).json({
+            message: 'لم يتم العثور على التعليق'
         });
-    }).catch((err) => {
+    res.status(200).json({
+        message: 'تم حذف التعليق بنجاح'
+    });
+    }catch(err){
         res.status(500).json({
             message: 'حدث خطأ أثناء حذف التعليق',
             err
         });
-    });
+    }
 }
 
 module.exports.updateComments = async (req, res) => {
