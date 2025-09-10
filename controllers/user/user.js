@@ -110,7 +110,7 @@ module.exports.getProdUser = async (req, res) => {
             Product.find({
                 Owner_id: user_id
             })
-            .populate('Owner_id', 'name email Location workplace work_type whats_app averageRating')
+            .populate('Owner_id', 'name email Location workplace work_type phone whats_app averageRating')
         ]);
         if (!userExists) {
             return res.status(404).json({
