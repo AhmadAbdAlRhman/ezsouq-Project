@@ -105,23 +105,78 @@ module.exports.getProdUser = async (req, res) => {
             return res.status(400).json({
                 message: "معرّف غير صالح"
             });
-        const [userExists, products] = await Promise.all([
-            User.findById(user_id),
-            Product.find({
-                Owner_id: user_id
-            })
-            .populate('Owner_id', 'name email Location workplace work_type phone whats_app averageRating')
-        ]);
+        const userExists = await User.findById(user_id);
         if (!userExists) {
-            return res.status(404).json({
-                message: "المستخدم غير موجود"
-            });
+            return res.status(404).json({ message: "المستخدم غير موجود" });
         }
+        const products = await Product.aggregate([
+            {
+                $match: { Owner_id: new mongoose.Types.ObjectId(user_id) }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "Owner_id",
+                    foreignField: "_id",
+                    as: "Owner"
+                }
+            },
+            { $unwind: "$Owner" },
+            {
+                $lookup: {
+                    from: "feedbacks",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "comments"
+                }
+            },
+            {
+                $addFields: {
+                    commentsCount: { $size: "$comments" }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    description: 1,
+                    price: 1,
+                    Category_name: 1,
+                    Governorate_name: 1,
+                    city: 1,
+                    main_photos: 1,
+                    views: 1,
+                    commentsCount: 1,
+                    video:1,
+                    color:1,
+                    isnew:1,
+                    photos:1,
+                    engine_type:1,
+                    shape:1,
+                    real_estate_type:1,
+                    for_sale:1,
+                    in_Furniture:1,
+                    processor:1,
+                    Sotarge:1,
+                    likes:1,
+                    views:1,
+                    "Owner._id": 1,
+                    "Owner.name": 1,
+                    "Owner.email": 1,
+                    "Owner.Location": 1,
+                    "Owner.workplace": 1,
+                    "Owner.work_type": 1,
+                    "Owner.phone": 1,
+                    "Owner.whats_app": 1,
+                    "Owner.averageRating": 1,
+                    "Owner.avatar": 1
+                }
+            }
+        ]);
         res.status(200).json(products);
     } catch (err) {
-        console.error(err);
         res.status(500).json({
-            message: "حدث خطأ في السيرفر"
+            message: "حدث خطأ في السيرفر",
+            Error: err.message
         });
     }
 }

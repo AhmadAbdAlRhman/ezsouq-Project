@@ -336,7 +336,6 @@ module.exports.search = async (req, res) => {
                     Governorate_name: 1,
                     city: 1,
                     main_photos: 1,
-                    views: 1,
                     commentsCount: 1,
                     video:1,
                     color:1,
