@@ -159,6 +159,7 @@ module.exports.getProdUser = async (req, res) => {
                     Sotarge:1,
                     likes:1,
                     views:1,
+                    createdAt:1,
                     "Owner._id": 1,
                     "Owner.name": 1,
                     "Owner.email": 1,
