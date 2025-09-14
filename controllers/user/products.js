@@ -284,22 +284,30 @@ module.exports.search = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
-
-        const filter = keyword ? {
-            $or: [{
-                    name: {
-                        $regex: keyword,
-                        $options: 'i'
-                    }
-                },
-                {
-                    description: {
-                        $regex: keyword,
-                        $options: 'i'
-                    }
-                }
-            ]
-        } : {};
+        const filter = {};
+        if (keyword){
+            filter.$or = [
+                {name: {$regex: keyword, $options: 'i'}},
+                {description: {$regex: keyword, $options: 'i'}}
+            ];
+        }
+        if (req.query.city)
+            filter.city = req.query.city;
+        if (req.query.governorate)
+            filter.Governorate_name = req.query.governorate;
+        if (req.query.isnew)
+            filter.isnew = req.query.isnew === 'true';
+        if (req.query.minPice || req.query.minPrice){
+            filter.price = {};
+            if (req.query.minPrice)
+                filter.price.$gte = parseFloat(req.query.minPrice);
+            if (req.query.maxPrice)
+                filter.price.$lte = parseFloat(req.query.maxPrice);
+        }
+        let sort = {createdAt: -1};
+        if (req.query.sort === 'priceAsc') sort = {price:1}
+        if (req.query.sort === 'priceDesc') sort = {price:-1}
+        if (req.query.sort === 'newest') sort = {price:-1}
         const products = await Products.aggregate([
             { $match: filter },
             {
@@ -324,7 +332,7 @@ module.exports.search = async (req, res) => {
                     commentsCount: { $size: "$comments" }
                 }
             },
-            { $sort: { createdAt: -1 } },
+            { $sort: sort },
             { $skip: skip },
             { $limit: limit },
             {
@@ -374,7 +382,6 @@ module.exports.search = async (req, res) => {
             totalItems: total,
         });
     } catch (err) {
-        console.error('Error during product search:', err);
         return res.status(500).json({
             message: 'حدث خطأ أثناء البحث عن المنتجات',
             error: err.message,
