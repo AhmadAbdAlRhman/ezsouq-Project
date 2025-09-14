@@ -307,7 +307,7 @@ module.exports.search = async (req, res) => {
         let sort = {createdAt: -1};
         if (req.query.sort === 'priceAsc') sort = {price:1}
         if (req.query.sort === 'priceDesc') sort = {price:-1}
-        if (req.query.sort === 'newest') sort = {price:-1}
+        if (req.query.sort === 'oldest') sort = {createdAt: 1}
         const products = await Products.aggregate([
             { $match: filter },
             {
