@@ -297,7 +297,7 @@ module.exports.search = async (req, res) => {
             filter.Governorate_name = req.query.governorate;
         if (req.query.isnew)
             filter.isnew = req.query.isnew === 'true';
-        if (req.query.minPice || req.query.minPrice){
+        if (req.query.minPice || req.query.maxPrice){
             filter.price = {};
             if (req.query.minPrice)
                 filter.price.$gte = parseFloat(req.query.minPrice);
