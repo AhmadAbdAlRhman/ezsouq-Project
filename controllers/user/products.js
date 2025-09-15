@@ -187,20 +187,23 @@ module.exports.getOneProduct = async (req, res) => {
         return res.status(400).json({
             message: "معرّف غير صالح"
         });
-    try{
-        const product = await Products.aggregate([
-            {
-                $match: { _id: new mongoose.Types.ObjectId(pro_id) }
+    try {
+        const product = await Products.aggregate([{
+                $match: {
+                    _id: new mongoose.Types.ObjectId(pro_id)
+                }
             },
             {
                 $lookup: {
-                    from: "users",            // اسم الكولكشن تبع المستخدمين
-                    localField: "Owner_id",   // الحقل عند المنتجات
-                    foreignField: "_id",      // الحقل عند users
+                    from: "users", // اسم الكولكشن تبع المستخدمين
+                    localField: "Owner_id", // الحقل عند المنتجات
+                    foreignField: "_id", // الحقل عند users
                     as: "Owner"
                 }
             },
-            { $unwind: "$Owner" },
+            {
+                $unwind: "$Owner"
+            },
             {
                 $lookup: {
                     from: "feedbacks",
@@ -219,8 +222,12 @@ module.exports.getOneProduct = async (req, res) => {
             },
             {
                 $addFields: {
-                    commentsCount: { $size: "$comments" },
-                    likesCount: { $size: "$likesUsers" }
+                    commentsCount: {
+                        $size: "$comments"
+                    },
+                    likesCount: {
+                        $size: "$likesUsers"
+                    }
                 }
             },
             {
@@ -229,24 +236,24 @@ module.exports.getOneProduct = async (req, res) => {
                     description: 1,
                     price: 1,
                     commentsCount: 1,
-                    Category_name:1,
-                    Governorate_name:1,
-                    city:1,
-                    main_photos:1,
-                    video:1,
-                    color:1,
-                    isnew:1,
-                    photos:1,
-                    engine_type:1,
-                    shape:1,
-                    real_estate_type:1,
-                    for_sale:1,
-                    in_Furniture:1,
-                    processor:1,
-                    Sotarge:1,
-                    likes:1,
-                    views:1,
-                    createdAt:1,
+                    Category_name: 1,
+                    Governorate_name: 1,
+                    city: 1,
+                    main_photos: 1,
+                    video: 1,
+                    color: 1,
+                    isnew: 1,
+                    photos: 1,
+                    engine_type: 1,
+                    shape: 1,
+                    real_estate_type: 1,
+                    for_sale: 1,
+                    in_Furniture: 1,
+                    processor: 1,
+                    Sotarge: 1,
+                    likes: 1,
+                    views: 1,
+                    createdAt: 1,
                     "Owner._id": 1,
                     "Owner.name": 1,
                     "Owner.Role": 1,
@@ -263,15 +270,17 @@ module.exports.getOneProduct = async (req, res) => {
                     "likesUsers.name": 1,
                     "likesUsers.avatar": 1
                 }
-                }
+            }
         ]);
 
         if (!product || product.length === 0) {
-            return res.status(404).json({ message: "لا يوجد مثل هذا المنتج" });
+            return res.status(404).json({
+                message: "لا يوجد مثل هذا المنتج"
+            });
         }
 
         return res.status(200).json(product[0]);
-    }catch(err){
+    } catch (err) {
         res.status(500).json({
             message: "حدث خطأ أثناء جلب المنتج الواحد",
             Error: err.message
@@ -285,31 +294,50 @@ module.exports.search = async (req, res) => {
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
         const filter = {};
-        if (keyword){
-            filter.$or = [
-                {name: {$regex: keyword, $options: 'i'}},
-                {description: {$regex: keyword, $options: 'i'}}
+        if (keyword) {
+            filter.$or = [{
+                    name: {
+                        $regex: keyword,
+                        $options: 'i'
+                    }
+                },
+                {
+                    description: {
+                        $regex: keyword,
+                        $options: 'i'
+                    }
+                }
             ];
         }
+        if (req.query.category)
+            filter.Category_name = req.query.category;
         if (req.query.city)
             filter.city = req.query.city;
         if (req.query.governorate)
             filter.Governorate_name = req.query.governorate;
         if (req.query.isnew)
             filter.isnew = req.query.isnew === 'true';
-        if (req.query.minPrice || req.query.maxPrice){
+        if (req.query.minPrice || req.query.maxPrice) {
             filter.price = {};
             if (req.query.minPrice)
                 filter.price.$gte = parseFloat(req.query.minPrice);
             if (req.query.maxPrice)
                 filter.price.$lte = parseFloat(req.query.maxPrice);
         }
-        let sort = {createdAt: -1};
-        if (req.query.sort === 'priceAsc') sort = {price:1}
-        if (req.query.sort === 'priceDesc') sort = {price:-1}
-        if (req.query.sort === 'oldest') sort = {createdAt: 1}
-        const products = await Products.aggregate([
-            { $match: filter },
+        let sort = {
+            createdAt: -1
+        };
+        if (req.query.sort) {
+            const sorts = req.query.sort.split(',');
+            sorts.forEach(s => {
+                if (s === 'priceAsc') sort.price = 1;
+                if (s === 'priceDesc') sort.price = -1;
+                if (s === 'oldest') sort.createdAt = 1;
+            })
+        }
+        const products = await Products.aggregate([{
+                $match: filter
+            },
             {
                 $lookup: {
                     from: "users",
@@ -318,7 +346,9 @@ module.exports.search = async (req, res) => {
                     as: "Owner"
                 }
             },
-            { $unwind: "$Owner" },
+            {
+                $unwind: "$Owner"
+            },
             {
                 $lookup: {
                     from: "feedbacks",
@@ -329,12 +359,20 @@ module.exports.search = async (req, res) => {
             },
             {
                 $addFields: {
-                    commentsCount: { $size: "$comments" }
+                    commentsCount: {
+                        $size: "$comments"
+                    }
                 }
             },
-            { $sort: sort },
-            { $skip: skip },
-            { $limit: limit },
+            {
+                $sort: sort
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            },
             {
                 $project: {
                     name: 1,
@@ -345,19 +383,19 @@ module.exports.search = async (req, res) => {
                     city: 1,
                     main_photos: 1,
                     commentsCount: 1,
-                    video:1,
-                    color:1,
-                    isnew:1,
-                    photos:1,
-                    engine_type:1,
-                    shape:1,
-                    real_estate_type:1,
-                    for_sale:1,
-                    in_Furniture:1,
-                    processor:1,
-                    Sotarge:1,
-                    likes:1,
-                    views:1,
+                    video: 1,
+                    color: 1,
+                    isnew: 1,
+                    photos: 1,
+                    engine_type: 1,
+                    shape: 1,
+                    real_estate_type: 1,
+                    for_sale: 1,
+                    in_Furniture: 1,
+                    processor: 1,
+                    Sotarge: 1,
+                    likes: 1,
+                    views: 1,
                     "Owner._id": 1,
                     "Owner.name": 1,
                     "Owner.Role": 1,
@@ -435,7 +473,7 @@ module.exports.toggleFavorite = async (req, res) => {
     }
 }
 
-module.exports.getAllSaved = async (req, res) => { 
+module.exports.getAllSaved = async (req, res) => {
     try {
         const user_id = req.user.id;
         const page = parseInt(req.query.page) || 1;
