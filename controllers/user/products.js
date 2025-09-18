@@ -26,6 +26,8 @@ module.exports.getAllProducts = async (req, res) => {
             filter.city = req.query.city;
         if (req.query.governorates)
             filter.Governorate_name = req.query.governorates;
+        if (req.query.real_estate_type)
+            filter.real_estate_type = req.query.real_estate_type;
         if (req.query.Category)
             filter.Category_name = req.query.Category;
         const sortField = req.query.sortBy || 'createdAt';
