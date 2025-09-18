@@ -317,6 +317,8 @@ module.exports.search = async (req, res) => {
             filter.Governorate_name = req.query.governorate;
         if (req.query.isnew)
             filter.isnew = req.query.isnew === 'true';
+        if (req.query.real_estate_type)
+            filter.real_estate_type = req.query.real_estate_type;
         if (req.query.minPrice || req.query.maxPrice) {
             filter.price = {};
             if (req.query.minPrice)
