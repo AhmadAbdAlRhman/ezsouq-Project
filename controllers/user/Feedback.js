@@ -110,7 +110,7 @@ module.exports.deleteComment = async (req, res) => {
     const id = req.params.comment_id;
     const user_id = req.user.id;
     try{
-        const deleted =  Feedback.findByIdAndDelete(
+        const deleted = await Feedback.findOneAndDelete(
         {
             _id: id,
             user_id: user_id
