@@ -10,19 +10,20 @@ module.exports.getInfoUser = async (req, res) => {
         return res.status(400).json({
             message: "معرّف غير صالح"
         });
-    await User.findById(user_id).select('_id name email Role Location workplace work_type whats_app phone averageRating').then((user) => {
+    try {
+        const user = await User.findById(user_id).select('_id name email Role Location workplace work_type whats_app phone averageRating avatar');
         if (!user)
             return res.status(404).json({
                 message: "لا يوجد مثل هذا المستخدم"
             });
         return res.status(200).json(user);
-    }).catch((err) => {
+    } catch (err) {
         res.status(500)
             .json({
-                message: "Error Server",
+                message: "خطأ في الخادم",
                 Error: err.details
             });
-    });
+    };
 }
 
 module.exports.updateInformationUser = async (req, res) => {
@@ -217,7 +218,9 @@ module.exports.addPhoto = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: "المستخدم غير موجود" });
+            return res.status(404).json({
+                message: "المستخدم غير موجود"
+            });
         }
         if (user.avatar) {
             try {
