@@ -107,11 +107,14 @@ module.exports.getProdUser = async (req, res) => {
             });
         const userExists = await User.findById(user_id);
         if (!userExists) {
-            return res.status(404).json({ message: "المستخدم غير موجود" });
+            return res.status(404).json({
+                message: "المستخدم غير موجود"
+            });
         }
-        const products = await Product.aggregate([
-            {
-                $match: { Owner_id: new mongoose.Types.ObjectId(user_id) }
+        const products = await Product.aggregate([{
+                $match: {
+                    Owner_id: new mongoose.Types.ObjectId(user_id)
+                }
             },
             {
                 $lookup: {
@@ -121,7 +124,9 @@ module.exports.getProdUser = async (req, res) => {
                     as: "Owner"
                 }
             },
-            { $unwind: "$Owner" },
+            {
+                $unwind: "$Owner"
+            },
             {
                 $lookup: {
                     from: "feedbacks",
@@ -132,7 +137,15 @@ module.exports.getProdUser = async (req, res) => {
             },
             {
                 $addFields: {
-                    commentsCount: { $size: "$comments" }
+                    comments: {
+                        $filter: {
+                            input: "$comments",
+                            as: "comment",
+                            cond: {
+                                $eq: ["$$comment.user_id", new mongoose.Types.ObjectId(user_id)]
+                            }
+                        }
+                    }
                 }
             },
             {
@@ -146,20 +159,20 @@ module.exports.getProdUser = async (req, res) => {
                     main_photos: 1,
                     views: 1,
                     commentsCount: 1,
-                    video:1,
-                    color:1,
-                    isnew:1,
-                    photos:1,
-                    engine_type:1,
-                    shape:1,
-                    real_estate_type:1,
-                    for_sale:1,
-                    in_Furniture:1,
-                    processor:1,
-                    Sotarge:1,
-                    likes:1,
-                    views:1,
-                    createdAt:1,
+                    video: 1,
+                    color: 1,
+                    isnew: 1,
+                    photos: 1,
+                    engine_type: 1,
+                    shape: 1,
+                    real_estate_type: 1,
+                    for_sale: 1,
+                    in_Furniture: 1,
+                    processor: 1,
+                    Sotarge: 1,
+                    likes: 1,
+                    views: 1,
+                    createdAt: 1,
                     "Owner._id": 1,
                     "Owner.name": 1,
                     "Owner.email": 1,
@@ -182,19 +195,23 @@ module.exports.getProdUser = async (req, res) => {
     }
 }
 
-module.exports.addPhoto = async(req, res) => {
+module.exports.addPhoto = async (req, res) => {
     try {
         const userId = req.user.id;
         if (!req.file) {
-            return res.status(400).json({ message: "الرجاء رفع صورة" });
+            return res.status(400).json({
+                message: "الرجاء رفع صورة"
+            });
         }
 
         const photoUrl = `/uploads/users/${req.file.filename}`;
 
         const user = await User.findByIdAndUpdate(
-            userId,
-            { avatar: photoUrl },
-            { new: true }
+            userId, {
+                avatar: photoUrl
+            }, {
+                new: true
+            }
         );
 
         res.status(200).json({
@@ -203,6 +220,9 @@ module.exports.addPhoto = async(req, res) => {
         });
     } catch (error) {
         console.log(error.message)
-        res.status(500).json({ message: "خطأ أثناء رفع الصورة", Error:error.message });
+        res.status(500).json({
+            message: "خطأ أثناء رفع الصورة",
+            Error: error.message
+        });
     }
 }
