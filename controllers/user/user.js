@@ -149,6 +149,13 @@ module.exports.getProdUser = async (req, res) => {
                 }
             },
             {
+                $addFields: {
+                    commentsCount: {
+                        $size: "$comments"
+                    }
+                }
+            },
+            {
                 $project: {
                     name: 1,
                     description: 1,
