@@ -1,3 +1,5 @@
+const fs = require("fs").promises;
+const path = require("path");
 const User = require('../../models/users');
 const Product = require('../../models/products');
 const mongoose = require('mongoose');
@@ -211,22 +213,30 @@ module.exports.addPhoto = async (req, res) => {
             });
         }
 
-        const photoUrl = `/uploads/users/${req.file.filename}`;
+        const photoUrl = `${req.protocol}://${req.get("host")}/uploads/users/${req.file.filename}`;
 
-        const user = await User.findByIdAndUpdate(
-            userId, {
-                avatar: photoUrl
-            }, {
-                new: true
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "المستخدم غير موجود" });
+        }
+        if (user.avatar) {
+            try {
+                const oldFileName = user.avatar.split("/uploads/users/")[1];
+                if (oldFileName) {
+                    const oldFilePath = path.join(__dirname, "../uploads/users", oldFileName);
+                    await fs.unlink(oldFilePath); // حذف الملف بشكل غير متزامن
+                }
+            } catch (err) {
+                console.warn("فشل حذف الصورة القديمة:", err.message);
             }
-        );
-
+        }
+        user.avatar = photoUrl;
+        await user.save();
         res.status(200).json({
             message: "تم تحديث صورة البروفايل بنجاح ✅",
             user
         });
     } catch (error) {
-        console.log(error.message)
         res.status(500).json({
             message: "خطأ أثناء رفع الصورة",
             Error: error.message
