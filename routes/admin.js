@@ -7,6 +7,8 @@ const products = require('../controllers/admin/Products');
 const Users = require('../controllers/admin/users');
 const statistics = require('../controllers/admin/statistics');
 const report = require('../controllers/user/Reported');
+const message = require('../controllers/user/message');
+
 //إضافة محافظة مع المدن التابعة لها
 router.post('/add_governorates', protect, checkRole(['ADMIN', 'OWNER']), Governorates.addGovernorates);
 //=>تعديل أسماء المحافظة والمدن التابعة لها
@@ -35,4 +37,16 @@ router.get('/top_users', protect, checkRole(['ADMIN', 'OWNER']), Users.getTopUse
 router.get('/top_products', protect, checkRole(['ADMIN', 'OWNER']), products.getTopProducts);
 // حذف المنتحات
 router.delete('/delete_products', protect, checkRole(['ADMIN', 'OWNER']), products.DeleteProducts);
+// جلب كل الرسائل
+router.get("/get_all_message", protect, checkRole(['ADMIN', 'OWNER']), message.getAllMessage);
+//جلب رسالة واحدة
+router.get("/get_one_message/:id", protect, checkRole(['ADMIN', 'OWNER']), message.getAllMessage);
+//جلب الرسائل الغير مقروءة
+router.get("/get_unread_message", protect, checkRole(['ADMIN', 'OWNER']), message.getUnreadMessages);
+// جعل الرسائل مقروء
+router.put("/mark_as_read", protect, checkRole(['ADMIN', 'OWNER']), message.markAsRead);
+// جلب عدد الرسائل الغير مقروءة
+router.get("/get_as_read_count", protect, checkRole(['ADMIN', 'OWNER']), message.markAsRead);
+// حذف الرسالة
+router.delete("/delete_message/:id", protect, checkRole(['ADMIN', 'OWNER']), message.markAsRead);
 module.exports = router;
