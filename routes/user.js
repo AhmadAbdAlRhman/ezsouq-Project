@@ -40,6 +40,7 @@ router.get('/get_product_user/:user_id', user.getProdUser);
 router.put('/update_information', protect, user.updateInformationUser);
 router.post('/rating_publisher', protect, user.ratingPublisher);
 router.put('/photo', protect, uploadimage.single("avatar"),user.addPhoto);
+router.get("/users/photo/:user_id", user.getOnePhotoByUserId);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,
