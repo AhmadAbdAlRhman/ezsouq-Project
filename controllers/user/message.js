@@ -3,11 +3,11 @@ module.exports.sendMessage = async (req, res) => {
     try {
         const {
             name,
-            email,
+            subject,
             message
         } = req.body;
 
-        if (!name || !email || !message) {
+        if (!name || !subject || !message) {
             return res.status(400).json({
                 message: "الاسم، البريد، والرسالة مطلوبة"
             });
@@ -15,7 +15,7 @@ module.exports.sendMessage = async (req, res) => {
 
         const newMessage = await Message.create({
             name,
-            email,
+            subject,
             message
         });
 
