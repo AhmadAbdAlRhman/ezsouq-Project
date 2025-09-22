@@ -154,7 +154,7 @@ module.exports.getUnreadCount = async (_req, res) => {
     }
 };
 
-module.exports.deleteMessage = async (res, res) => {
+module.exports.deleteMessage = async (req, res) => {
     try {
         const message_id = req.params.id;
         if (!mongoose.Types.ObjectId.isValid(message_id))
