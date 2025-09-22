@@ -5,6 +5,7 @@ const products = require('../controllers/user/products');
 const user = require('../controllers/user/user');
 const feedback = require('../controllers/user/Feedback');
 const report = require('../controllers/user/Reported');
+const message = require('../controllers/user/message');
 const {upload, uploadimage} = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 const checkRole = require('../middleware/checkRole');
@@ -41,6 +42,8 @@ router.put('/update_information', protect, user.updateInformationUser);
 router.post('/rating_publisher', protect, user.ratingPublisher);
 router.put('/photo', protect, uploadimage.single("avatar"),user.addPhoto);
 router.get("/user_photo/:user_id", user.getOnePhotoByUserId);
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+router.post("/contact",message.sendMessage);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,
