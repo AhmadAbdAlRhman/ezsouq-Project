@@ -91,7 +91,8 @@
         } catch (err) {
             console.error('OAuth Error:', err ?.response ?.data || err.message);
             res.status(500).json({
-                error: 'فشلت المصادقة مع Google'
+                message: 'فشلت المصادقة مع Google',
+                Error: err.message
             });
         }
     };
