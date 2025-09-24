@@ -140,15 +140,7 @@ module.exports.getProdUser = async (req, res) => {
             },
             {
                 $addFields: {
-                    comments: {
-                        $filter: {
-                            input: "$comments",
-                            as: "comment",
-                            cond: {
-                                $eq: ["$$comment.user_id", new mongoose.Types.ObjectId(user_id)]
-                            }
-                        }
-                    }
+                    commentsCount: { $size: "$comments" }
                 }
             },
             {
