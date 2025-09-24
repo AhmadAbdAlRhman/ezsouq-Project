@@ -6,6 +6,7 @@ const reset = require("../controllers/Auth/rest_password");
 
 router.get('/auth/google', OAuth.login);
 router.get('/auth/google/callback', OAuth.callback);
+router.post('/auth/google/AndroidLogin', OAuth.AndroidLogin);
 // router.get('/profile', OAuth.getProfile);
 
 router.post('/register', Auth.register);

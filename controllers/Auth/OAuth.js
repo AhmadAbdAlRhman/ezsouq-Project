@@ -3,7 +3,9 @@
     const User = require('../../models/google_user');
     const jwt = require('jsonwebtoken');
     const qs = require('querystring');
-
+    const {
+        OAuth2Client
+    } = require('google-auth-library');
     const {
         generateToken
     } = require("../../functions/jwt");
@@ -75,24 +77,74 @@
                     avatar: picture,
                     Role: 'USER'
                 });
-            } else {
-                const token = generateToken(user);
-                res.json({
-                    message: "تمت المصادقة عن طريق ال جوجل",
-                    token,
-                    user: {
-                        _id: user._id,
-                        name: user.name,
-                        email: user.email,
-                        avatar: user.avatar
-                    }
-                });
             }
+            const token = generateToken(user);
+            res.json({
+                message: "تمت المصادقة عن طريق ال جوجل",
+                token,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    avatar: user.avatar
+                }
+            });
+
         } catch (err) {
-            console.error('OAuth Error:', err ?.response ?.data || err.message);
+            console.error('OAuth Error:', err.message, err.response?.data);
             res.status(500).json({
                 message: 'فشلت المصادقة مع Google',
                 Error: err.message
             });
         }
     };
+
+    module.exports.AndroidLogin = async (req, res) => {
+        try {
+            const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+            const token = req.body.token;
+            const ticket = await client.verifyIdToken({
+                idToken: token,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+            const payload = ticket.getPayload();
+            const {
+                sub,
+                email,
+                name,
+                picture
+            } = payload;
+            let user = await User.findOne({
+                googleId: sub
+            });
+            if (!user) {
+                user = await User.create({
+                    googleId: sub,
+                    email,
+                    name,
+                    avatar: picture,
+                });
+            } else {
+                user.name = name;
+                user.picture = picture;
+                await user.save();
+            }
+            const tokeny = generateToken(user);
+            res.json({
+                success: true,
+                token: tokeny,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    picture: user.avatar,
+                },
+            });
+        } catch (err) {
+            console.error("Auth error:", err.message);
+            res.status(401).json({
+                message: "حدث خطأ أثناء التسجيل ",
+                error: err.message
+            });
+        }
+    }
