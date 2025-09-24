@@ -170,7 +170,7 @@ module.exports.getOneComment = async (req, res) => {
                 path: 'replies',
                 populate: {
                     path: 'user_id',
-                    select: '_id name email'
+                    select: '_id name email avatar'
                 }
             });
 
