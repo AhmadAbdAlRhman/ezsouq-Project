@@ -125,11 +125,7 @@
                     avatar: picture,
                     Role:'USER'
                 });
-            } else {
-                user.name = name;
-                user.picture = picture;
-                await user.save();
-            }
+            } 
             const tokeny = generateToken(user);
             res.json({
                 success: true,
