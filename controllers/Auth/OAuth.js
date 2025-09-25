@@ -123,6 +123,7 @@
                     email,
                     name,
                     avatar: picture,
+                    Role:'USER'
                 });
             } else {
                 user.name = name;
