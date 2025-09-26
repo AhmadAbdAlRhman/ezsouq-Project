@@ -26,15 +26,25 @@ module.exports.register = async (req, res) => {
         const name = req.body.name;
         const email = req.body.email;
         const password = req.body.password;
-        const exists = await User.findOne({
+        let user = await User.findOne({
             email
         });
-        const user = await User.create({
-            name,
-            email,
-            password,
-            Role: 'USER'
-        });
+        if(user){
+            if (!user.password) {
+                user.password = password;
+                user.name = user.name || name;
+                await user.save();
+            } else {
+                return res.status(400).json({ message: "هذا البريد مستخدم مسبقًا" });
+            }
+        }else{
+            user = await User.create({
+                name,
+                email,
+                password,
+                Role: 'USER'
+            });
+        }
         res.status(201).json({
             message: "تم إنشاء المستخدم بنجاح",
             _id: user._id,
@@ -44,7 +54,7 @@ module.exports.register = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
-            message: "Server error",
+            message: "حدث خطأ أثناء تسجيل الدخول",
             error: err.message
         });
     }

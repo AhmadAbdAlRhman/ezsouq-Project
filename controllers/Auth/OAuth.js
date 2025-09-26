@@ -77,8 +77,12 @@
                     avatar: picture,
                     Role: 'USER'
                 });
-            }else{
-                user.googleId= id;
+            } else {
+                if (!user.googleId) {
+                    user.googleId = id;
+                }
+                if (!user.avatar) user.avatar = picture;
+                if (!user.name) user.name = name;
                 await user.save();
             }
             const token = generateToken(user);
@@ -90,12 +94,13 @@
                     _id: user._id,
                     name: user.name,
                     email: user.email,
+                    Role: user.Role,
                     avatar: user.avatar
                 }
             });
 
         } catch (err) {
-            console.error('OAuth Error:', err.message, err.response?.data);
+            console.error('OAuth Error:', err.message, err.response ?.data);
             res.status(500).json({
                 message: 'فشلت المصادقة مع Google',
                 Error: err.message
@@ -119,17 +124,25 @@
                 picture
             } = payload;
             let user = await User.findOne({
-                googleId: sub
+                email
             });
-            if (!user) {
-                user = await User.create({
-                    googleId: sub,
-                    email,
-                    name,
-                    avatar: picture,
-                    Role:'USER'
-                });
-            } 
+            if (user) {
+                if (!user.googleId) {
+                    user.googleId = sub;
+                    user.avatar = user.avatar || picture;
+                    user.name = user.name || name;
+                    await user.save();
+
+                } else {
+                    user = await User.create({
+                        googleId: sub,
+                        email,
+                        name,
+                        avatar: picture,
+                        Role: 'USER'
+                    });
+                }
+            }
             const tokeny = generateToken(user);
             res.json({
                 success: true,
@@ -138,12 +151,13 @@
                     id: user._id,
                     name: user.name,
                     email: user.email,
+                    Role: user.Role,
                     picture: user.avatar,
                 },
             });
         } catch (err) {
             console.error("Auth error:", err.message);
-            res.status(401).json({
+            res.status(500).json({
                 message: "حدث خطأ أثناء التسجيل ",
                 error: err.message
             });
