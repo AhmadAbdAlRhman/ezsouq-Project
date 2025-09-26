@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const ffmpeg = require("fluent-ffmpeg");
 const sanitize = require("sanitize-filename");
-const fsPromises = require("fs").promises;
+const safeUnlink = require('./unlink');
 
 const optimizedDirImage = path.join(__dirname, "../uploads/images/optimized");
 const optimizedDirVideo = path.join(__dirname, "../uploads/videos/optimized");
@@ -30,13 +30,7 @@ async function processImage(filePath) {
                 quality: 80
             })
             .toFile(outputPath);
-        try {
-            await fsPromises.unlink(filePath);
-        } catch (err) {
-            console.error("❌ فشل حذف الملف:", err);
-        }
-
-
+        await safeUnlink(filePath);
         return outputFilename;
     } catch (err) {
         console.error("❌ خطأ في معالجة الصورة:", err);
