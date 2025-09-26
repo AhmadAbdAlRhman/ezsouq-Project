@@ -83,6 +83,7 @@
                 message: "تمت المصادقة عن طريق ال جوجل",
                 token,
                 user: {
+                    googleId: id,
                     _id: user._id,
                     name: user.name,
                     email: user.email,

@@ -5,7 +5,7 @@ const ffmpeg = require("fluent-ffmpeg");
 const sanitize = require("sanitize-filename");
 const safeUnlink = require('./unlink');
 
-const optimizedDirImage = path.join(__dirname, "../uploads/images/optimized");
+const optimizedDirImage = path.join(__dirname, "../uploads/images");
 const optimizedDirVideo = path.join(__dirname, "../uploads/videos/optimized");
 
 if (!fs.existsSync(optimizedDirImage)) fs.mkdirSync(optimizedDirImage, {
