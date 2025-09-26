@@ -15,6 +15,18 @@ const UserSchema = new mongoose.Schema({
         required: false,
         unique: true,
     },
+    googleId: {
+        type: String,
+        required: false,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: false,
+        unique: false,
+    },
+    resetToken: String,
+    resetTokenExpire: Date,
     avatar: {
         type: String,
         required: false,

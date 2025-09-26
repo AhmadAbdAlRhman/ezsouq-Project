@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const User = require("../../models/email_user");
+const User = require("../../models/users");
 const nodemailer = require("nodemailer");
 //This is for send Code to Email for mobile
 module.exports.requestResetCode = async (req, res) => {

@@ -1,6 +1,6 @@
     require('dotenv').config();
     const axios = require("axios");
-    const User = require('../../models/google_user');
+    const User = require('../../models/users');
     const jwt = require('jsonwebtoken');
     const qs = require('querystring');
     const {

@@ -1,4 +1,4 @@
-const User = require("../../models/email_user");
+const User = require("../../models/users");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
 const {
