@@ -29,9 +29,6 @@ module.exports.register = async (req, res) => {
         const exists = await User.findOne({
             email
         });
-        if (exists) return res.status(409).json({
-            message: "هذا الإيمل مستخدم من قبل"
-        });
         const user = await User.create({
             name,
             email,
