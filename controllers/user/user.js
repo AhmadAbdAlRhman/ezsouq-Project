@@ -31,7 +31,6 @@ module.exports.updateInformationUser = async (req, res) => {
         const userId = req.user.id;
         const updates = {
             name: req.body.name,
-            avatar: req.body.avatar,
             phone: req.body.phone,
             Location: req.body.Location,
             workplace: req.body.workplace,
