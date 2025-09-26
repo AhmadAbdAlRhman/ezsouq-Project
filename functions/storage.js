@@ -17,10 +17,10 @@ const storage = multer.diskStorage({
 });
 
 const storageuser = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (_req, _file, cb) => {
         cb(null, "uploads/users");
     },
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname)); // اسم فريد للملف
     }
 });

@@ -2,6 +2,7 @@ const Gategory = require('../../models/Category');
 const Products = require('../../models/products');
 const User = require('../../models/users');
 const mongoose = require('mongoose');
+const  {processImage}  = require('../../functions/processImage');
 module.exports.getAllCategories = async (_req, res) => {
     await Gategory.find({}).then((gategory) => {
         if (!gategory)
@@ -127,13 +128,17 @@ module.exports.addProduct = async (req, res) => {
             storage
         } = req.body;
 
-        if (!name || !Category_name || !Governorate_name || !city || !price) {
+        if (!name || !description || !Category_name || !Governorate_name || !city || !price) {
             return res.status(400).json({
                 message: "الرجاء تعبئة جميع الحقول الأساسية."
             });
         }
-        const mainPhotos = req.files ?. ['main_photos'] ?.map(file => file.filename) || [];
-        const optionalPhotos = req.files ?. ['photos'] ?.map(file => file.filename) || [];
+        const mainPhotos = req.files?.["main_photos"]
+                ? await Promise.all(req.files["main_photos"].map(f => processImage(f.path)))
+                : [];
+        const optionalPhotos = req.files?.["photos"]
+                ? await Promise.all(req.files["photos"].map(f => processImage(f.path)))
+                : [];
         const video = req.files ?. ['video'] ?. [0] ?.filename || null;
         if (mainPhotos.length !== 3) {
             return res.status(400).json({
