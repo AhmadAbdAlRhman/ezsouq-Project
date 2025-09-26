@@ -77,6 +77,9 @@
                     avatar: picture,
                     Role: 'USER'
                 });
+            }else{
+                user.googleId= id;
+                await user.save();
             }
             const token = generateToken(user);
             res.json({
