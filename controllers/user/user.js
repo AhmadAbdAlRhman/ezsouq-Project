@@ -170,7 +170,7 @@ module.exports.getProdUser = async (req, res) => {
                     for_sale: 1,
                     in_Furniture: 1,
                     processor: 1,
-                    Sotarge: 1,
+                    sotarge: 1,
                     likes: 1,
                     views: 1,
                     createdAt: 1,
