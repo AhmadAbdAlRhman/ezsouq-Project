@@ -7,7 +7,7 @@ const ProductsSchema = new mongoose.Schema({
     },
     Category_name: {
         type: String,
-        ref: 'category',    
+        ref: 'category',
         required: true,
     },
     Owner_id: {
@@ -104,7 +104,7 @@ const ProductsSchema = new mongoose.Schema({
     },
     //for mobile
     processor: String,
-    Sotarge: Number,
+    storage: Number,
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'

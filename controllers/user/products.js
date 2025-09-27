@@ -66,6 +66,7 @@ module.exports.getAllProducts = async (req, res) => {
             {
                 $project: {
                     comments: 0,
+                    
                     "Owner.password": 0,
                     "Owner.email": 0,
                     "Owner.favorites": 0,
