@@ -59,8 +59,8 @@ const ProductsSchema = new mongoose.Schema({
     engine_type:{
         type:String,
         enum:[
-            'اتوماتيك',
-            'غيير عادي',
+            'أوتوماتيك',
+            'عادي',
             ''
         ],
         default: null
