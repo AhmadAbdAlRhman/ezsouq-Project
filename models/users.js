@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
         required: false,
     },
     phone: {
-        type: Number
+        type: String
     },
     Location: {
         type: String,
@@ -56,7 +56,7 @@ const UserSchema = new mongoose.Schema({
         ]
     },
     whats_app: {
-        type: Number,
+        type: String,
         required: false
     },
     favorites: [{
