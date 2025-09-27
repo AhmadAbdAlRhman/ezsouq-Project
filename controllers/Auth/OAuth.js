@@ -133,16 +133,17 @@
                     user.name = user.name || name;
                     await user.save();
 
-                } else {
-                    user = await User.create({
-                        googleId: sub,
-                        email,
-                        name,
-                        avatar: picture,
-                        Role: 'USER'
-                    });
                 }
+            } else {
+                user = await User.create({
+                    googleId: sub,
+                    email,
+                    name,
+                    avatar: picture,
+                    Role: 'USER'
+                });
             }
+
             const tokeny = generateToken(user);
             res.json({
                 success: true,
