@@ -124,7 +124,7 @@ module.exports.addProduct = async (req, res) => {
             shape,
             real_estate_type,
             for_sale,
-            is_Furniture,
+            in_Furniture,
             processor,
             storage
         } = req.body;
@@ -169,7 +169,7 @@ module.exports.addProduct = async (req, res) => {
             color,
             isnew: isnew === 'true' || isnew === true,
             for_sale: for_sale === 'true' || for_sale === true,
-            is_Furniture: is_Furniture === 'true' || is_Furniture === true,
+            in_Furniture: in_Furniture === 'true' || in_Furniture === true,
             shape,
             real_estate_type,
             processor,

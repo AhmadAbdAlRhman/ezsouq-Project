@@ -100,7 +100,7 @@ const ProductsSchema = new mongoose.Schema({
     in_Furniture: {
         type: Boolean,
         required: false,
-        default: null
+        default: false
     },
     //for mobile
     processor: String,
