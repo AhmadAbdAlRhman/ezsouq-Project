@@ -104,7 +104,7 @@ const ProductsSchema = new mongoose.Schema({
     },
     //for mobile
     processor: String,
-    storage: Number,
+    storage: String,
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
