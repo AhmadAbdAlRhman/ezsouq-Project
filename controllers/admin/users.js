@@ -1,6 +1,6 @@
 const User = require('../../models/users');
 const Products = require('../../models/products');
-
+const mongoose =require('mongoose');
 module.exports.GrantingPermissions = async (req, res) => {
     const user_id = req.body.user_id;
     await User.findByIdAndUpdate({
