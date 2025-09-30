@@ -83,7 +83,12 @@ module.exports.login = async (req, res) => {
             return res.status(404).json({
                 message: "المستخدم غير مسجل من قبل"
             });
-        } else if (!(await user.matchPassword(password))) {
+        } else if(user.Role === 'BANNED'){
+            return res.status(403).json({
+                message: "هذا الإيميل محظور من قبل ال مسؤول"
+            });
+        }
+        else if (!(await user.matchPassword(password))) {
             return res.status(401).json({
                 message: "كلمة المرور غير صحيحة"
             });

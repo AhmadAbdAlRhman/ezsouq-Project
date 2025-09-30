@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const BlacklistToken = require("../models/BlacklistToken");
+const User = require("../models/users");
 require('dotenv').config();
 module.exports = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -17,6 +18,14 @@ module.exports = async (req, res, next) => {
         });
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ message: "المستخدم غير موجود" });
+        }
+
+        if (user.Role === 'BANNED') {
+            return res.status(403).json({ message: "تم حظرك من النظام" });
+        }
         req.user = decoded;
         next();
     } catch (err) {
