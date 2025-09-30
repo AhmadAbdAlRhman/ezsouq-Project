@@ -158,8 +158,7 @@ module.exports.getUser = async (req, res) => {
 
 module.exports.getTopUser = async (_req, res) => {
     try {
-        const topUsers = await Products.aggregate([
-            {
+        const topUsers = await Products.aggregate([{
                 $group: {
                     _id: "$Owner_id",
                     totalProducts: {
@@ -167,17 +166,25 @@ module.exports.getTopUser = async (_req, res) => {
                     }
                 }
             },
-            { $sort: {totalProducts: -1}},
-            {$limit: 2},
             {
-                $lookup:{
-                    from:"users",
+                $sort: {
+                    totalProducts: -1
+                }
+            },
+            {
+                $limit: 2
+            },
+            {
+                $lookup: {
+                    from: "users",
                     localField: "_id",
                     foreignField: "_id",
                     as: "user"
                 }
             },
-            { $unwind: "$user"},
+            {
+                $unwind: "$user"
+            },
             {
                 $project: {
                     _id: 0,
@@ -185,15 +192,60 @@ module.exports.getTopUser = async (_req, res) => {
                     userName: "$user.name",
                     avatar: "$user.avatar",
                     email: "$user.eamil",
-                    phone: "$user.phone",   
+                    phone: "$user.phone",
                     totalProducts: 1
                 }
             }
         ]);
-        res.status(200).json({topUsers});
+        res.status(200).json({
+            topUsers
+        });
     } catch (err) {
         res.status(500).json({
             message: "مستخدمين TOP حدث خطأ أثناء جلب ",
+            Error: err.message
+        })
+    }
+}
+
+module.exports.toggleBanUser = async (req, res) => {
+    try {
+        const user_id = req.body.userId;
+        const action = req.body.action;
+        if (!mongoose.Types.ObjectId.isValid(user_id)) {
+            return res.status(400).json({
+                message: "معرّف غير صالح"
+            });
+        }
+        let banStatus ;
+        if(action === 'ban')
+            banStatus = true;
+        else if(action === 'unban'){
+            banStatus = false;
+        }else{
+            return res.status(400).json({
+                message: "الرجاء إرسال action صحيح (ban أو unban)"
+            });
+        }
+        const user = await User.findByIdAndUpdate(user_id, {
+            isBanned: banStatus
+        }, {
+            new: true
+        });
+        if (!user) {
+            return res.status(404).json({
+                message: "لا يوجد مثل هذا المستخدم"
+            });
+        }
+        const msg = banStatus
+            ? "تم حظر المستخدم بنجاح"
+            : "تم إلغاء حظر المستخدم بنجاح";
+        return res.status(200).json({
+            message: msg
+        })
+    } catch (err) {
+        return res.status(500).json({
+            message: "حدث خطأ أثناء تحديث حالة الحظر",
             Error: err.message
         })
     }

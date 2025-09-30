@@ -52,7 +52,8 @@ const UserSchema = new mongoose.Schema({
         enum: [
             'USER',
             'ADMIN',
-            'OWNER'
+            'OWNER',
+            'BANNED'
         ]
     },
     whats_app: {

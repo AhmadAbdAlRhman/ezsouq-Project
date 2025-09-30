@@ -49,4 +49,6 @@ router.put("/mark_as_read", protect, checkRole(['ADMIN', 'OWNER']), message.mark
 router.get("/get_as_read_count", protect, checkRole(['ADMIN', 'OWNER']), message.markAsRead);
 // حذف الرسالة
 router.delete("/delete_message/:id", protect, checkRole(['ADMIN', 'OWNER']), message.markAsRead);
+// تحديث حالة الحظر
+router.put('/toggleBanUser', protect, checkRole(['ADMIN','OWNER']),Users.toggleBanUser);
 module.exports = router;
