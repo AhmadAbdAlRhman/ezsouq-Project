@@ -36,6 +36,8 @@ module.exports.getTopProducts = async (_req, res) => {
                 $project: {
                     name: 1,
                     Owner_id: 1,
+                    Governorate_name: 1,
+                    city: 1,
                     main_photo: {
                         $arrayElemAt: ["$main_photos", 0]
                     },
@@ -71,6 +73,8 @@ module.exports.getTopProducts = async (_req, res) => {
                     _id: 1,
                     name: 1,
                     main_photo: 1,
+                    Governorate_name:1,
+                    city:1,
                     views: 1,
                     totalLikes: 1,
                 }
