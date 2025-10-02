@@ -54,5 +54,5 @@ router.delete("/delete_message/:id", protect, checkRole(['ADMIN', 'OWNER']), mes
 // تحديث حالة الحظر
 router.put('/toggleBanUser', protect, checkRole(['ADMIN','OWNER']),Users.toggleBanUser);
 //بحث عن المستخدمين
-router.get('/search_user', protect, , checkRole(['ADMIN','OWNER']),Users.searchUser);
+router.get('/search_user', protect, checkRole(['ADMIN','OWNER']),Users.searchUser);
 module.exports = router;
