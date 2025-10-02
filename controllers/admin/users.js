@@ -1,6 +1,6 @@
 const User = require('../../models/users');
 const Products = require('../../models/products');
-const mongoose =require('mongoose');
+const mongoose = require('mongoose');
 module.exports.GrantingPermissions = async (req, res) => {
     const user_id = req.body.user_id;
     await User.findByIdAndUpdate({
@@ -106,8 +106,9 @@ module.exports.getAllUser = async (req, res) => {
                 }
             };
         }
-        const usersWithProductCount = await User.aggregate([
-            { $match: roleFilter },
+        const usersWithProductCount = await User.aggregate([{
+                $match: roleFilter
+            },
             {
                 $lookup: {
                     from: 'products',
@@ -118,7 +119,9 @@ module.exports.getAllUser = async (req, res) => {
             },
             {
                 $addFields: {
-                    productCount: { $size: "$products" }
+                    productCount: {
+                        $size: "$products"
+                    }
                 }
             },
             {
@@ -127,7 +130,7 @@ module.exports.getAllUser = async (req, res) => {
                     name: 1,
                     email: 1,
                     Role: 1,
-                    avatar:1,
+                    avatar: 1,
                     phone: 1,
                     Location: 1,
                     workplace: 1,
@@ -137,9 +140,17 @@ module.exports.getAllUser = async (req, res) => {
                     productCount: 1
                 }
             },
-            { $sort: { name: 1 } },
-            { $skip: skip },
-            { $limit: limit }
+            {
+                $sort: {
+                    name: 1
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
         ]);
         const total = await User.countDocuments(roleFilter);
         const totalPages = Math.ceil(total / limit);
@@ -248,12 +259,12 @@ module.exports.toggleBanUser = async (req, res) => {
                 message: "معرّف غير صالح"
             });
         }
-        let banStatus ;
-        if(action === 'ban')
+        let banStatus;
+        if (action === 'ban')
             banStatus = true;
-        else if(action === 'unban'){
+        else if (action === 'unban') {
             banStatus = false;
-        }else{
+        } else {
             return res.status(400).json({
                 message: "الرجاء إرسال action صحيح (ban أو unban)"
             });
@@ -268,9 +279,9 @@ module.exports.toggleBanUser = async (req, res) => {
                 message: "لا يوجد مثل هذا المستخدم"
             });
         }
-        const msg = banStatus
-            ? "تم حظر المستخدم بنجاح"
-            : "تم إلغاء حظر المستخدم بنجاح";
+        const msg = banStatus ?
+            "تم حظر المستخدم بنجاح" :
+            "تم إلغاء حظر المستخدم بنجاح";
         return res.status(200).json({
             message: msg
         })
@@ -279,5 +290,58 @@ module.exports.toggleBanUser = async (req, res) => {
             message: "حدث خطأ أثناء تحديث حالة الحظر",
             Error: err.message
         })
+    }
+}
+
+module.exports.searchUser = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1; // رقم الصفحة (pagination)
+        const limit = parseInt(req.query.limit) || 8; // عدد العناصر في كل صفحة
+        const skip = (page - 1) * limit;
+        const search = req.query.search || '';
+        let query = {};
+        if (search) {
+            query.$or = [{
+                    "name": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }, // البحث في اسم المستخدم
+                {
+                    "email": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }, // البحث في البريد الإلكتروني
+                {
+                    "phone": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }, // البحث في رقم الهاتف
+                {
+                    "work_type": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                } // البحث في نوع العمل
+            ];
+        }
+        const users = await User.find(query)
+            .skip(skip)
+            .limit(limit);
+        const total = await User.countDocuments(query);
+        const totalPages = Math.ceil(total / limit);
+        return res.status(200).json({
+            data: users,
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "فشل في البحث عن المستخدمين",
+            error: err.message
+        });
     }
 }
