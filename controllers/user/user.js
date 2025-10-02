@@ -139,7 +139,9 @@ module.exports.getProdUser = async (req, res) => {
             },
             {
                 $addFields: {
-                    commentsCount: { $size: "$comments" }
+                    commentsCount: {
+                        $size: "$comments"
+                    }
                 }
             },
             {
@@ -243,17 +245,23 @@ module.exports.getOnePhotoByUserId = async (req, res) => {
         const user_id = req.params.user_id;
 
         if (!mongoose.Types.ObjectId.isValid(user_id)) {
-            return res.status(400).json({ message: "معرّف غير صالح" });
+            return res.status(400).json({
+                message: "معرّف غير صالح"
+            });
         }
 
         const user = await User.findById(user_id).select("avatar");
 
         if (!user) {
-            return res.status(404).json({ message: "لا يوجد مثل هذا المستخدم" });
+            return res.status(404).json({
+                message: "لا يوجد مثل هذا المستخدم"
+            });
         }
 
         if (!user.avatar) {
-            return res.status(404).json({ message: "لا توجد صورة للمستخدم" });
+            return res.status(404).json({
+                message: "لا توجد صورة للمستخدم"
+            });
         }
 
         return res.status(200).json({
@@ -268,3 +276,4 @@ module.exports.getOnePhotoByUserId = async (req, res) => {
         });
     }
 };
+

@@ -106,14 +106,45 @@ module.exports.getAllUser = async (req, res) => {
                 }
             };
         }
-        const filter = roleFilter;
-        const [users, total] = await Promise.all([
-            User.find(filter).skip(skip).limit(limit),
-            User.countDocuments(filter)
+        const usersWithProductCount = await User.aggregate([
+            { $match: roleFilter },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: 'Owner_id',
+                    as: 'products'
+                }
+            },
+            {
+                $addFields: {
+                    productCount: { $size: "$products" }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    email: 1,
+                    Role: 1,
+                    avatar:1,
+                    phone: 1,
+                    Location: 1,
+                    workplace: 1,
+                    work_type: 1,
+                    whats_app: 1,
+                    averageRating: 1,
+                    productCount: 1
+                }
+            },
+            { $sort: { name: 1 } },
+            { $skip: skip },
+            { $limit: limit }
         ]);
+        const total = await User.countDocuments(roleFilter);
         const totalPages = Math.ceil(total / limit);
         return res.status(200).json({
-            data: users,
+            data: usersWithProductCount,
             currentPage: page,
             totalPages,
             totalItems: total,

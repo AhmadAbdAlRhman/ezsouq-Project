@@ -25,7 +25,7 @@ router.post('/likedProduct', protect, products.toggleLike);
 router.put('/set_count_views/:productId',protect, products.setViews);
 router.delete('/delete_product/:productId',protect, products.deleteProduct);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-router.post('/report', protect, report.reportProducts);
+router.post('/report_user', protect, report.report);
 router.get('/get_one_report/:reporteId', protect, report.get_one_reporte);
 router.put('/update_report/:reporteId', protect, report.update_reporte);
 router.delete('/delete_report/:reporteId', protect, report.delete_reporte);

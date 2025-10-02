@@ -21,8 +21,10 @@ router.put('/Withdraw_permissions', protect, checkRole(['OWNER']), Users.Withdra
 router.delete('/Delet_User', protect, checkRole(['OWNER']), Users.DeleteUser);
 //إضافة التنصيف
 router.post('/add_category', protect, checkRole(['ADMIN', 'OWNER']), products.addCtegory);
-//عرض التقراير
-router.get('/all_reports', protect, checkRole(['ADMIN', 'OWNER']), report.get_all_reportedProducts);
+//عرض الإبلاغ
+router.get('/all_reports', protect, checkRole(['ADMIN', 'OWNER']), report.get_all_reported);
+//تغير حالة الإبلاغ
+router.get('/reports/:id/status', protect, checkRole(['ADMIN', 'OWNER']), report.changeStatus);
 //admin عرض جميع المستخدمين ال عادريين وال
 router.get('/get_all_users', protect, checkRole(['OWNER']), Users.getAllUser);
 //admin عرض جميع المستخدمين ال عادريين

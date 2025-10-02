@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const ReportSchema = new mongoose.Schema({
-    product: {
+    reporter: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Products',
+        ref: 'Users',
         required: true
     },
-    reported_By: {
+    reported: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
         required: true
@@ -14,10 +14,14 @@ const ReportSchema = new mongoose.Schema({
     reason: {
         type: String,
         required: true,
-        enum: ['محتوى مزيف', 'منتج مكرر', 'مخالف للشروط', 'أخرى','']
     },
-    message: {
+    details: {
         type: String
+    },
+    status:{
+        type: String,
+        enum:['معلق','تمت المراجعة'],
+        defaut:'تمت المراجعة'
     },
     createdAt: {
         type: Date,
