@@ -13,6 +13,10 @@ const message = require('../controllers/user/message');
 router.post('/add_governorates', protect, checkRole(['ADMIN', 'OWNER']), Governorates.addGovernorates);
 //=>تعديل أسماء المحافظة والمدن التابعة لها
 router.put('/update_governorate/:gov_id', protect, checkRole(['ADMIN', 'OWNER']), Governorates.updateGovernorate);
+//حذف المحافظة
+router.delete('/delete_governorate/:governorate_id', protect, checkRole(['ADMIN', 'OWNER']), Governorates.deleteGovernorate);
+//حذف المدينة
+router.put('/delete_city/:governorate_id', protect, checkRole(['ADMIN', 'OWNER']), Governorates.deleteCity);
 //منح صلاحية الأدمن للمستخدم العادي
 router.put('/Granting_permissions', protect, checkRole(['OWNER']), Users.GrantingPermissions);
 //سحب صلاحية الأدمن
