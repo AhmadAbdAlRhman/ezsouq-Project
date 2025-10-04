@@ -270,7 +270,7 @@ module.exports.toggleBanUser = async (req, res) => {
             });
         }
         const user = await User.findByIdAndUpdate(user_id, {
-            isBanned: banStatus
+            Role: banStatus
         }, {
             new: true
         });
