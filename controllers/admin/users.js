@@ -261,9 +261,9 @@ module.exports.toggleBanUser = async (req, res) => {
         }
         let banStatus;
         if (action === 'ban')
-            banStatus = true;
+            banStatus = "BANNED";
         else if (action === 'unban') {
-            banStatus = false;
+            banStatus = "Un_BANNED";
         } else {
             return res.status(400).json({
                 message: "الرجاء إرسال action صحيح (ban أو unban)"
