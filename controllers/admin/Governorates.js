@@ -1,4 +1,5 @@
 const Governorates = require('../../models/Governorates');
+const mongoose = require("mongoose");
 module.exports.addGovernorates = async (req, res) => {
     const name = req.body.name;
     const cities = req.body.cities;
