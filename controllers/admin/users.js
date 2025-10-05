@@ -362,11 +362,17 @@ module.exports.getRatedUser = async (_req, res) => {
                     email: 1,
                     ratings: 1,
                     ratedBy: {
-                        _id: 1,
-                        name: 1,
-                        email: 1,
-                        rating: 1
+                        $map: {
+                            input: "$ratedBy",
+                            as: "r",
+                            in: {
+                                _id: "$$r._id",
+                                name: "$$r.name",
+                                email: "$$r.email"
+                            }
+                        }
                     },
+                    averageRating: 1,
                     ratingCount: {
                         $size: {
                             $ifNull: ["$ratings", []]
