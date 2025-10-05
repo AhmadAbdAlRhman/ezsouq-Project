@@ -345,3 +345,39 @@ module.exports.searchUser = async (req, res) => {
         });
     }
 }
+
+module.exports.getRatedUser =async (_req, res) => {
+    try{
+        const userWithRatings = await User.aggregate([
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"ratings.user_id",
+                    foreignField:"_id",
+                    as:'ratedBy'
+                }
+            },
+            {
+                $project:{
+                    name: 1,
+                    email: 1,
+                    ratings: 1,
+                    ratedBy: {_id:1 ,name: 1, email: 1, rating: 1},
+                    ratingCount: {$size: "$ratings"},
+                }
+            }
+        ]);
+        if (!userWithRatings || userWithRatings.length === 0) {
+            return res.status(404).json({ message: "لا يوجد مستخدمين" });
+        };
+        return res.status(200).json({
+            message: "تم جلب جميع التقييمات بنجاح",
+            data: users
+        });
+    }catch (err) {
+        return res.status(500).json({
+            message: "حدث خطأ أثناء جلب البيانات",
+            error: err.message
+        });
+    }
+}

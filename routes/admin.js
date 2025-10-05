@@ -59,4 +59,6 @@ router.delete("/delete_message/:id", protect, checkRole(['ADMIN', 'OWNER']), mes
 router.put('/toggleBanUser', protect, checkRole(['ADMIN','OWNER']),Users.toggleBanUser);
 //بحث عن المستخدمين
 router.get('/search_user', protect, checkRole(['ADMIN','OWNER']),Users.searchUser);
+//جلب المستخدمين مع تقييماتون
+router.get('/rated_user', protect, checkRole(['ADMIN','OWNER']),Users.getRatedUser);
 module.exports = router;
