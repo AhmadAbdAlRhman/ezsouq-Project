@@ -350,7 +350,7 @@ module.exports.getRatedUser = async (_req, res) => {
     try {
         const userWithRatings = await User.aggregate([{
                 $lookup: {
-                    from: "Users",
+                    from: "users",
                     localField: "ratings.user_id",
                     foreignField: "_id",
                     as: 'ratedBy'
@@ -382,7 +382,7 @@ module.exports.getRatedUser = async (_req, res) => {
         };
         return res.status(200).json({
             message: "تم جلب جميع التقييمات بنجاح",
-            data: users
+            data: userWithRatings
         });
     } catch (err) {
         return res.status(500).json({
