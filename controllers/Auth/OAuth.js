@@ -26,7 +26,7 @@
         const code = req.query.code;
         if (!code) {
             return res.status(400).json({
-                error: 'Missing "code" in query params'
+                error: 'خطاء بالكود المرسل'
             });
         }
         try {
@@ -84,6 +84,11 @@
                 if (!user.avatar) user.avatar = picture;
                 if (!user.name) user.name = name;
                 await user.save();
+            }
+            if(user.Role === 'BANNED'){
+                return res.status(403).json({
+                    message: "هذا الإيميل محظور من قبل ال مسؤول"
+                });
             }
             const token = generateToken(user);
             res.json({
@@ -143,7 +148,11 @@
                     Role: 'USER'
                 });
             }
-
+            if(user.Role === 'BANNED'){
+                return res.status(403).json({
+                    message: "هذا الإيميل محظور من قبل ال مسؤول"
+                });
+            }
             const tokeny = generateToken(user);
             res.json({
                 success: true,

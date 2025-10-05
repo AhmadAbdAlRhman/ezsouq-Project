@@ -472,14 +472,14 @@ module.exports.toggleFavorite = async (req, res) => {
         await user.save();
 
         return res.status(200).json({
-            message: isFavorite ? 'تمت إزالة المنتج من المفضلة' : 'تمت إضافة المنتج إلى المفضلة',
+            message: isFavorite ? 'تمت إزالة المنتج من المحفوظات' : 'تمت إضافة المنتج إلى المحفوظات',
             favorite: !isFavorite,
             productId: product_id
         });
 
     } catch (err) {
         return res.status(500).json({
-            message: 'حدث خطأ أثناء تعديل المفضلة',
+            message: 'حدث خطأ أثناء تعديل المحفوظات',
             error: err.message
         });
     }
