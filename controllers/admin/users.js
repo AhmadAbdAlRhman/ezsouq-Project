@@ -366,17 +366,28 @@ module.exports.getRatedUser = async (_req, res) => {
                                 $mergeObjects: [
                                     "$$r",
                                     {
-                                        $arrayElemAt: [{
-                                                $filter: {
-                                                    input: "$ratedBy",
-                                                    as: "u",
-                                                    cond: {
-                                                        $eq: ["$$u._id", "$$r.user_id"]
-                                                    }
+                                        $let: {
+                                            vars: {
+                                                u: {
+                                                    $arrayElemAt: [
+                                                        {
+                                                            $filter: {
+                                                                input: "$ratedBy",
+                                                                as: "u",
+                                                                cond: { $eq: ["$$u._id", "$$r.user_id"] }
+                                                            }
+                                                        },
+                                                        0
+                                                    ]
                                                 }
                                             },
-                                            0
-                                        ]
+                                            in: {
+                                                _id: "$$u._id",
+                                                name: "$$u.name",
+                                                email: "$$u.email",
+                                                avatar: "$$u.avatar"
+                                            }
+                                        }
                                     }
                                 ]
                             }
