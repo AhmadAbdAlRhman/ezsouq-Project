@@ -391,9 +391,6 @@ module.exports.getRatedUser = async (_req, res) => {
                     avatar: 1,
                     ratings: 1,
                     averageRating: 1,
-                    resetTokenExpire : 0,
-                    resetToken : 0,
-                    password: 0,
                     ratingCount: {
                         $size: {
                             $ifNull: ["$ratings", []]
