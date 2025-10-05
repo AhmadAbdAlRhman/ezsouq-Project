@@ -357,27 +357,45 @@ module.exports.getRatedUser = async (_req, res) => {
                 }
             },
             {
+                $addFields: {
+                    ratings: {
+                        $map: {
+                            input: "$ratings",
+                            as: "r",
+                            in: {
+                                $mergeObjects: [
+                                    "$$r",
+                                    {
+                                        $arrayElemAt: [{
+                                                $filter: {
+                                                    input: "$ratedBy",
+                                                    as: "u",
+                                                    cond: {
+                                                        $eq: ["$$u._id", "$$r.user_id"]
+                                                    }
+                                                }
+                                            },
+                                            0
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            {
                 $project: {
                     name: 1,
                     email: 1,
+                    avatar: 1,
                     ratings: 1,
-                    ratedBy: {
-                        $map: {
-                            input: "$ratedBy",
-                            as: "r",
-                            in: {
-                                _id: "$$r._id",
-                                name: "$$r.name",
-                                email: "$$r.email"
-                            }
-                        }
-                    },
                     averageRating: 1,
                     ratingCount: {
                         $size: {
                             $ifNull: ["$ratings", []]
                         }
-                    },
+                    }
                 }
             }
         ]);
