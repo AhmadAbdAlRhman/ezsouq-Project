@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer '))
         return res.status(404).json({
-            message: "Token missing"
+            message: "انتهت الجلسة. الرجاء تسجيل الدخول مجدداً"
         });
     const token = authHeader.split(' ')[1];
     const isTokenBlacklisted = await BlacklistToken.findOne({
@@ -25,6 +25,9 @@ module.exports = async (req, res, next) => {
 
         if (user.Role === 'BANNED') {
             return res.status(403).json({ message: "تم حظرك من النظام" });
+        }
+        if (user.tokenVersion !== decoded.tokenVersion) {
+            return res.status(401).json({ message: "انتهت الجلسة. الرجاء تسجيل الدخول مجدداً" });
         }
         req.user = decoded;
         next();

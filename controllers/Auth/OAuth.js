@@ -75,7 +75,8 @@
                     name: name,
                     email: email,
                     avatar: picture,
-                    Role: 'USER'
+                    Role: 'USER',
+                    tokenVersion: 0
                 });
             } else {
                 if (!user.googleId) {

@@ -42,7 +42,8 @@ module.exports.register = async (req, res) => {
                 name,
                 email,
                 password,
-                Role: 'USER'
+                Role: 'USER',
+                tokenVersion: 0
             });
         }
         res.status(201).json({

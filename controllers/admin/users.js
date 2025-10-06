@@ -254,23 +254,39 @@ module.exports.toggleBanUser = async (req, res) => {
     try {
         const user_id = req.body.userId;
         const action = req.body.action;
+        const id = req.user.id;
         if (!mongoose.Types.ObjectId.isValid(user_id)) {
             return res.status(400).json({
                 message: "معرّف غير صالح"
             });
         }
-        let banStatus;
-        if (action === 'ban')
-            banStatus = "BANNED";
-        else if (action === 'unban') {
-            banStatus = "Un_BANNED";
+        if (id === user_id) {
+            return res.status(400).json({
+                message: "لا يمكنك حظر نفسك"
+            });
+        }
+        let updateData = {};
+        let msg = "";
+        if (action === 'ban') {
+            updateData = {
+                Role: "BANNED",
+                $inc: {
+                    tokenVersion: 1
+                }
+            };
+            msg = "تم حظر المستخدم وتم إنهاء كل جلساته";
+        } else if (action === 'unban') {
+            updateData = {
+                Role: "USER"
+            };
+            msg = "تم إلغاء حظر المستخدم";
         } else {
             return res.status(400).json({
                 message: "الرجاء إرسال action صحيح (ban أو unban)"
             });
         }
         const user = await User.findByIdAndUpdate(user_id, {
-            Role: banStatus
+            updateData
         }, {
             new: true
         });
@@ -279,9 +295,6 @@ module.exports.toggleBanUser = async (req, res) => {
                 message: "لا يوجد مثل هذا المستخدم"
             });
         }
-        const msg = banStatus ?
-            "تم حظر المستخدم بنجاح" :
-            "تم إلغاء حظر المستخدم بنجاح";
         return res.status(200).json({
             message: msg
         })
@@ -346,8 +359,11 @@ module.exports.searchUser = async (req, res) => {
     }
 }
 
-module.exports.getRatedUser = async (_req, res) => {
+module.exports.getRatedUser = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
         const userWithRatings = await User.aggregate([{
                 $lookup: {
                     from: "users",
@@ -369,12 +385,13 @@ module.exports.getRatedUser = async (_req, res) => {
                                         $let: {
                                             vars: {
                                                 u: {
-                                                    $arrayElemAt: [
-                                                        {
+                                                    $arrayElemAt: [{
                                                             $filter: {
                                                                 input: "$ratedBy",
                                                                 as: "u",
-                                                                cond: { $eq: ["$$u._id", "$$r.user_id"] }
+                                                                cond: {
+                                                                    $eq: ["$$u._id", "$$r.user_id"]
+                                                                }
                                                             }
                                                         },
                                                         0
@@ -408,6 +425,12 @@ module.exports.getRatedUser = async (_req, res) => {
                         }
                     }
                 }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
             }
         ]);
         if (!userWithRatings || userWithRatings.length === 0) {
@@ -415,9 +438,16 @@ module.exports.getRatedUser = async (_req, res) => {
                 message: "لا يوجد مستخدمين"
             });
         };
+        const totalCount = await User.countDocuments();
         return res.status(200).json({
             message: "تم جلب جميع التقييمات بنجاح",
-            data: userWithRatings
+            data: userWithRatings,
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit)
+            }
         });
     } catch (err) {
         return res.status(500).json({

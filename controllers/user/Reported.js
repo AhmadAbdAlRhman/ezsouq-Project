@@ -130,8 +130,8 @@ module.exports.search_about_Report = async (req, res) => {
     try{
         const status  = req.query.status;
         const search  = req.query.search;
-        const page  = req.query.page || 1;
-        const limit  = req.query.limit || 8;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
         let query = {};
         if (status) {
             query.status = status;

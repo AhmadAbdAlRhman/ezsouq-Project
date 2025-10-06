@@ -56,6 +56,10 @@ const UserSchema = new mongoose.Schema({
             'BANNED'
         ]
     },
+    tokenVersion: {
+        type: Number,
+        default: 0
+    },
     whats_app: {
         type: String,
         required: false
