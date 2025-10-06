@@ -60,5 +60,9 @@ router.put('/toggleBanUser', protect, checkRole(['ADMIN','OWNER']),Users.toggleB
 //بحث عن المستخدمين
 router.get('/search_user', protect, checkRole(['ADMIN','OWNER']),Users.searchUser);
 //جلب المستخدمين مع تقييماتون
-router.get('/rated_user', protect, checkRole(['ADMIN','OWNER']),Users.getRatedUser);
+router.get('/rated_users', protect, checkRole(['ADMIN','OWNER']),Users.getRatedUser);
+//جلب المستخدم بواسطة ال id مع تقييماتون
+router.get('/rated_user/:userId', protect, checkRole(['ADMIN','OWNER']),Users.getRatedUserById);
+//حذف المستخدم بواسطة ال id مع تقييماتون
+router.get('/deleted_rated_user', protect, checkRole(['ADMIN','OWNER']),Users.deleteUserRating);
 module.exports = router;

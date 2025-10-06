@@ -169,6 +169,7 @@ module.exports.getAllUser = async (req, res) => {
     }
 
 }
+
 module.exports.getUser = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -456,3 +457,145 @@ module.exports.getRatedUser = async (req, res) => {
         });
     }
 }
+
+module.exports.getRatedUserById = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                message: "معرّف المستخدم غير صالح"
+            });
+        }
+        const userWithRatings = await User.aggregate([{
+                $match: {
+                    _id: new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "ratings.user_id",
+                    foreignField: "_id",
+                    as: "ratedBy"
+                }
+            },
+            {
+                $addFields: {
+                    ratings: {
+                        $map: {
+                            input: "$ratings",
+                            as: "r",
+                            in: {
+                                $mergeObjects: [
+                                    "$$r",
+                                    {
+                                        $let: {
+                                            vars: {
+                                                u: {
+                                                    $arrayElemAt: [{
+                                                            $filter: {
+                                                                input: "$ratedBy",
+                                                                as: "u",
+                                                                cond: {
+                                                                    $eq: ["$$u._id", "$$r.user_id"]
+                                                                }
+                                                            }
+                                                        },
+                                                        0
+                                                    ]
+                                                }
+                                            },
+                                            in: {
+                                                name: "$$u.name",
+                                                email: "$$u.email",
+                                                avatar: "$$u.avatar"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    email: 1,
+                    avatar: 1,
+                    ratings: 1,
+                    averageRating: 1,
+                    ratingCount: {
+                        $size: {
+                            $ifNull: ["$ratings", []]
+                        }
+                    }
+                }
+            }
+        ]);
+
+        if (!userWithRatings || userWithRatings.length === 0) {
+            return res.status(404).json({
+                message: "لا يوجد مستخدم بهذا المعرّف"
+            });
+        }
+        return res.status(200).json({
+            message: "تم جلب بيانات المستخدم وتقييماته بنجاح",
+            data: userWithRatings[0]
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "حدث خطأ أثناء جلب بيانات المستخدم",
+            error: err.message
+        });
+    }
+}
+
+module.exports.deleteUserRating = async (req, res) => {
+    try {
+        const  ratedUserId = req.body.ratedUserId;
+        const  ratedByUserId = req.body.ratedByUserId;
+        if (
+            !mongoose.Types.ObjectId.isValid(ratedUserId) ||
+            !mongoose.Types.ObjectId.isValid(ratedByUserId)
+        ) {
+            return res.status(400).json({
+                message: "معرّف المستخدم غير صالح"
+            });
+        }
+        const updatedUser = await User.findByIdAndUpdate(
+            ratedUserId, {
+                $pull: {
+                    ratings: {
+                        user_id: new mongoose.Types.ObjectId(ratedByUserId)
+                    }
+                }
+            }, {
+                new: true
+            }
+        );
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "لم يتم العثور على المستخدم المستهدف"
+            });
+        }
+        if (updatedUser.ratings.length > 0) {
+            const avg =
+                updatedUser.ratings.reduce((sum, r) => sum + (r.rating || 0), 0) /
+                updatedUser.ratings.length;
+            updatedUser.averageRating = avg;
+        } else {
+            updatedUser.averageRating = 0;
+        }
+        await updatedUser.save();
+        return res.status(200).json({
+            message: "تم حذف التقييم بنجاح",
+            data: updatedUser
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "حدث خطأ أثناء حذف التقييم",
+            error: err.message
+        });
+    }
+};
