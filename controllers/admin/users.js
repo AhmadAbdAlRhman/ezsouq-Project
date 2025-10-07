@@ -544,9 +544,7 @@ module.exports.getRatedUserById = async (req, res) => {
                             }
                         }
                     },
-                    averageRating: {
-                        $avg: "$ratingsData.averageRating"
-                    },
+                    averageRating: "$averageRating",
                     ratingCount: {
                         $size: "$ratingsData"
                     }
