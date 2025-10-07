@@ -493,7 +493,7 @@ module.exports.getRatedUserById = async (req, res) => {
             // نجلب التقييمات الخاصة بالمستخدم
             {
                 $lookup: {
-                    from: "ratings", // اسم مجموعة التقييمات في MongoDB
+                    from: "rating", // اسم مجموعة التقييمات في MongoDB
                     localField: "_id",
                     foreignField: "publish",
                     as: "ratingsData"
