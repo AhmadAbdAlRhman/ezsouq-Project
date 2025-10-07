@@ -557,19 +557,25 @@ module.exports.getRatedUserById = async (req, res) => {
                     name: 1,
                     email: 1,
                     avatar: 1,
-                    ratings: {
-                        sender: {
-                            _id: "$ratings.sender._id",
-                            name: "$ratings.sender.name",
-                            email: "$ratings.sender.email",
-                            avatar: "$ratings.sender.avatar"
-                        },
-                        value: 1,
-                        comment: 1,
-                        createdAt: 1
-                    },
                     averageRating: 1,
-                    ratingCount: 1
+                    ratingCount: 1,
+                    ratings: {
+                        $map: {
+                            input: "$ratings",
+                            as: "r",
+                            in: {
+                                sender: {
+                                    _id: "$$r.sender._id",
+                                    name: "$$r.sender.name",
+                                    email: "$$r.sender.email",
+                                    avatar: "$$r.sender.avatar"
+                                },
+                                value: "$$r.value",
+                                comment: "$$r.comment",
+                                createdAt: "$$r.createdAt"
+                            }
+                        }
+                    }
                 }
             }
         ]);
