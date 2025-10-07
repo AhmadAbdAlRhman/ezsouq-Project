@@ -527,6 +527,14 @@ module.exports.getRatedUserById = async (req, res) => {
             // دمج بيانات التقييم مع معلومات المرسلين
             {
                 $addFields: {
+                    ratingsData: {
+                        $sortArray: {
+                            input: "$ratingsData",
+                            sortBy: {
+                                createdAt: -1
+                            }
+                        }
+                    },
                     ratings: {
                         $map: {
                             input: "$ratingsData",
