@@ -475,64 +475,89 @@ module.exports.getRatedUser = async (req, res) => {
         });
     }
 }
-
 module.exports.getRatedUserById = async (req, res) => {
     try {
         const userId = req.params.userId;
+
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 message: "معرّف المستخدم غير صالح"
             });
         }
+
         const userWithRatings = await User.aggregate([{
                 $match: {
                     _id: new mongoose.Types.ObjectId(userId)
                 }
             },
+            // نجلب التقييمات الخاصة بالمستخدم
+            {
+                $lookup: {
+                    from: "ratings", // اسم مجموعة التقييمات في MongoDB
+                    localField: "_id",
+                    foreignField: "publish",
+                    as: "ratingsData"
+                }
+            },
+            // نجلب بيانات المستخدمين الذين قاموا بالتقييم
             {
                 $lookup: {
                     from: "users",
-                    localField: "ratings.user_id",
-                    foreignField: "_id",
-                    as: "ratedBy"
+                    let: {
+                        senders: "$ratingsData.sender"
+                    },
+                    pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$senders"]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                email: 1,
+                                avatar: 1
+                            }
+                        }
+                    ],
+                    as: "ratedByUsers"
                 }
             },
+            // دمج بيانات التقييم مع معلومات المرسلين
             {
                 $addFields: {
                     ratings: {
                         $map: {
-                            input: "$ratings",
+                            input: "$ratingsData",
                             as: "r",
                             in: {
                                 $mergeObjects: [
                                     "$$r",
                                     {
-                                        $let: {
-                                            vars: {
-                                                u: {
-                                                    $arrayElemAt: [{
-                                                            $filter: {
-                                                                input: "$ratedBy",
-                                                                as: "u",
-                                                                cond: {
-                                                                    $eq: ["$$u._id", "$$r.user_id"]
-                                                                }
-                                                            }
-                                                        },
-                                                        0
-                                                    ]
-                                                }
-                                            },
-                                            in: {
-                                                name: "$$u.name",
-                                                email: "$$u.email",
-                                                avatar: "$$u.avatar"
-                                            }
+                                        sender: {
+                                            $arrayElemAt: [{
+                                                    $filter: {
+                                                        input: "$ratedByUsers",
+                                                        as: "u",
+                                                        cond: {
+                                                            $eq: ["$$u._id", "$$r.sender"]
+                                                        }
+                                                    }
+                                                },
+                                                0
+                                            ]
                                         }
                                     }
                                 ]
                             }
                         }
+                    },
+                    averageRating: {
+                        $avg: "$ratingsData.value"
+                    },
+                    ratingCount: {
+                        $size: "$ratingsData"
                     }
                 }
             },
@@ -541,12 +566,13 @@ module.exports.getRatedUserById = async (req, res) => {
                     name: 1,
                     email: 1,
                     avatar: 1,
-                    ratings: 1,
                     averageRating: 1,
-                    ratingCount: {
-                        $size: {
-                            $ifNull: ["$ratings", []]
-                        }
+                    ratingCount: 1,
+                    ratings: {
+                        value: 1,
+                        comment: 1,
+                        createdAt: 1,
+                        sender: 1
                     }
                 }
             }
@@ -557,6 +583,7 @@ module.exports.getRatedUserById = async (req, res) => {
                 message: "لا يوجد مستخدم بهذا المعرّف"
             });
         }
+
         return res.status(200).json({
             message: "تم جلب بيانات المستخدم وتقييماته بنجاح",
             data: userWithRatings[0]
@@ -568,7 +595,6 @@ module.exports.getRatedUserById = async (req, res) => {
         });
     }
 }
-
 module.exports.deleteUserRating = async (req, res) => {
     try {
         const ratedUserId = req.body.ratedUserId;
