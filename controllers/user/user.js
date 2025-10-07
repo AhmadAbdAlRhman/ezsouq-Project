@@ -68,7 +68,7 @@ module.exports.ratingPublisher = async (req, res) => {
     try {
         const sender = req.user.id;
         const publishId = req.body.user_id;
-        const rating = parseInt(req.body.rating);
+        const ratingValue = parseInt(req.body.rating);
         const message = req.body.message;
         if (!ratingValue || ratingValue < 1 || ratingValue > 5)
             return res.status(400).json({
@@ -86,7 +86,7 @@ module.exports.ratingPublisher = async (req, res) => {
         await Rating.create({
             sender: sender,
             publish: publishId,
-            rating,
+            rating:ratingValue,
             message
         });
         const ratings = await Rating.find({

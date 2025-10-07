@@ -439,7 +439,6 @@ module.exports.getRatedUser = async (req, res) => {
                     name: 1,
                     email: 1,
                     avatar: 1,
-                    ratings: 1,
                     averageRating: 1,
                     ratingCount: 1
                 }
