@@ -370,38 +370,8 @@ module.exports.getRatedUser = async (req, res) => {
                 $lookup: {
                     from: "rating",
                     localField: "_id",
-                    foreignField: "publish",
+                    foreignField: "publish", // ✅ عدّل الاسم هنا حسب الحقل الفعلي في ratings
                     as: "ratingsData"
-                }
-            },
-            {
-                $addFields: {
-                    ratings: {
-                        $map: {
-                            input: "$ratingsData",
-                            as: "r",
-                            in: {
-                                $mergeObjects: [
-                                    "$$r",
-                                    {
-                                        ratedBy: {
-                                            $arrayElemAt: [{
-                                                    $filter: {
-                                                        input: "$$ROOT",
-                                                        as: "u",
-                                                        cond: {
-                                                            $eq: ["$$u._id", "$$r.sender"]
-                                                        }
-                                                    }
-                                                },
-                                                0
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
                 }
             },
             {
@@ -469,6 +439,7 @@ module.exports.getRatedUser = async (req, res) => {
                     name: 1,
                     email: 1,
                     avatar: 1,
+                    ratings: 1,
                     averageRating: 1,
                     ratingCount: 1
                 }
@@ -504,7 +475,6 @@ module.exports.getRatedUser = async (req, res) => {
             error: err.message
         });
     }
-
 }
 
 module.exports.getRatedUserById = async (req, res) => {
