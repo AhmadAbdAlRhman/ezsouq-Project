@@ -94,12 +94,12 @@ module.exports.ratingPublisher = async (req, res) => {
         });
         const total = ratings.reduce((sum, r) => sum + r.rating, 0);
         const average = total / ratings.length;
-        await User.findByIdAndUpdate(publishId, {
+        const pub = await User.findByIdAndUpdate(publishId, {
             averageRating: average
         });
         res.status(200).json({
             message: "تم تقييم الناشر.",
-            averageRating: publish.averageRating
+            averageRating: pub.averageRating
         });
     } catch (err) {
         res.status(500).json({
