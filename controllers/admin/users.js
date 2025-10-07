@@ -492,7 +492,7 @@ module.exports.getRatedUserById = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "rating",
+                    from: "ratings",
                     localField: "_id",
                     foreignField: "publish", // المستخدم الذي تم تقييمه
                     as: "ratingsData"
