@@ -570,8 +570,8 @@ module.exports.getRatedUserById = async (req, res) => {
                                     email: "$$r.sender.email",
                                     avatar: "$$r.sender.avatar"
                                 },
-                                value: "$$r.value",
-                                comment: "$$r.comment",
+                                rating: "$$r.rating",
+                                message: "$$r.message",
                                 createdAt: "$$r.createdAt"
                             }
                         }
