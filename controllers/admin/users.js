@@ -490,43 +490,25 @@ module.exports.getRatedUserById = async (req, res) => {
                     _id: new mongoose.Types.ObjectId(userId)
                 }
             },
-            // نجلب التقييمات الخاصة بالمستخدم
             {
                 $lookup: {
-                    from: "rating", // اسم مجموعة التقييمات في MongoDB
+                    from: "rating",
                     localField: "_id",
-                    foreignField: "publish",
+                    foreignField: "publish", // المستخدم الذي تم تقييمه
                     as: "ratingsData"
                 }
             },
-            // نجلب بيانات المستخدمين الذين قاموا بالتقييم
             {
                 $lookup: {
                     from: "users",
-                    let: {
-                        senders: "$ratingsData.sender"
-                    },
-                    pipeline: [{
-                            $match: {
-                                $expr: {
-                                    $in: ["$_id", "$$senders"]
-                                }
-                            }
-                        },
-                        {
-                            $project: {
-                                name: 1,
-                                email: 1,
-                                avatar: 1
-                            }
-                        }
-                    ],
+                    localField: "ratingsData.sender", // الأشخاص الذين قيّموا
+                    foreignField: "_id",
                     as: "ratedByUsers"
                 }
             },
-            // دمج بيانات التقييم مع معلومات المرسلين
             {
                 $addFields: {
+                    // ترتيب التقييمات من الأحدث للأقدم
                     ratingsData: {
                         $sortArray: {
                             input: "$ratingsData",
@@ -535,6 +517,7 @@ module.exports.getRatedUserById = async (req, res) => {
                             }
                         }
                     },
+                    // دمج معلومات الشخص المقيّم داخل كل تقييم
                     ratings: {
                         $map: {
                             input: "$ratingsData",
@@ -574,14 +557,19 @@ module.exports.getRatedUserById = async (req, res) => {
                     name: 1,
                     email: 1,
                     avatar: 1,
-                    averageRating: 1,
-                    ratingCount: 1,
                     ratings: {
+                        sender: {
+                            _id: "$ratings.sender._id",
+                            name: "$ratings.sender.name",
+                            email: "$ratings.sender.email",
+                            avatar: "$ratings.sender.avatar"
+                        },
                         value: 1,
                         comment: 1,
-                        createdAt: 1,
-                        sender: 1
-                    }
+                        createdAt: 1
+                    },
+                    averageRating: 1,
+                    ratingCount: 1
                 }
             }
         ]);
