@@ -598,7 +598,7 @@ module.exports.getRatedUserById = async (req, res) => {
 }
 module.exports.deleteUserRating = async (req, res) => {
     try {
-        const ratingId = req.body.ratingId;
+        const {ratingId} = req.body;
         if (!mongoose.Types.ObjectId.isValid(ratingId)) {
             return res.status(400).json({
                 message: "معرّف التقييم غير صالح",
