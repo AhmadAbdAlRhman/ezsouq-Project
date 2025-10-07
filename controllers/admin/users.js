@@ -368,7 +368,7 @@ module.exports.getRatedUser = async (req, res) => {
 
         const userWithRatings = await User.aggregate([{
                 $lookup: {
-                    from: "ratings",
+                    from: "rating",
                     localField: "_id",
                     foreignField: "publish",
                     as: "ratingsData"
