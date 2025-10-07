@@ -10,3 +10,4 @@ require('./products');
 require('./feedback');
 require('./Report');
 require('./Message');
+require('./ratingSchema');

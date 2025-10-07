@@ -68,17 +68,6 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Products'
     }],
-    ratings: [{
-        user_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Users'
-        },
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5
-        }
-    }],
     averageRating: {
         type: Number,
         default: 0

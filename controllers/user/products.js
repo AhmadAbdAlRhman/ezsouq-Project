@@ -70,7 +70,6 @@ module.exports.getAllProducts = async (req, res) => {
                     "Owner.password": 0,
                     "Owner.email": 0,
                     "Owner.favorites": 0,
-                    "Owner.ratings": 0
                 }
             },
             {

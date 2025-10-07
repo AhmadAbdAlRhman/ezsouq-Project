@@ -365,46 +365,37 @@ module.exports.getRatedUser = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+
         const userWithRatings = await User.aggregate([{
                 $lookup: {
-                    from: "users",
-                    localField: "ratings.user_id",
-                    foreignField: "_id",
-                    as: 'ratedBy'
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "publish",
+                    as: "ratingsData"
                 }
             },
             {
                 $addFields: {
                     ratings: {
                         $map: {
-                            input: "$ratings",
+                            input: "$ratingsData",
                             as: "r",
                             in: {
                                 $mergeObjects: [
                                     "$$r",
                                     {
-                                        $let: {
-                                            vars: {
-                                                u: {
-                                                    $arrayElemAt: [{
-                                                            $filter: {
-                                                                input: "$ratedBy",
-                                                                as: "u",
-                                                                cond: {
-                                                                    $eq: ["$$u._id", "$$r.user_id"]
-                                                                }
-                                                            }
-                                                        },
-                                                        0
-                                                    ]
-                                                }
-                                            },
-                                            in: {
-                                                _id: "$$u._id",
-                                                name: "$$u.name",
-                                                email: "$$u.email",
-                                                avatar: "$$u.avatar"
-                                            }
+                                        ratedBy: {
+                                            $arrayElemAt: [{
+                                                    $filter: {
+                                                        input: "$$ROOT",
+                                                        as: "u",
+                                                        cond: {
+                                                            $eq: ["$$u._id", "$$r.sender"]
+                                                        }
+                                                    }
+                                                },
+                                                0
+                                            ]
                                         }
                                     }
                                 ]
@@ -414,17 +405,72 @@ module.exports.getRatedUser = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "users",
+                    let: {
+                        senders: "$ratingsData.sender"
+                    },
+                    pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$senders"]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                email: 1,
+                                avatar: 1
+                            }
+                        }
+                    ],
+                    as: "ratedByUsers"
+                }
+            },
+            {
+                $addFields: {
+                    ratings: {
+                        $map: {
+                            input: "$ratingsData",
+                            as: "r",
+                            in: {
+                                $mergeObjects: [
+                                    "$$r",
+                                    {
+                                        sender: {
+                                            $arrayElemAt: [{
+                                                    $filter: {
+                                                        input: "$ratedByUsers",
+                                                        as: "u",
+                                                        cond: {
+                                                            $eq: ["$$u._id", "$$r.sender"]
+                                                        }
+                                                    }
+                                                },
+                                                0
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    averageRating: {
+                        $avg: "$ratingsData.value"
+                    },
+                    ratingCount: {
+                        $size: "$ratingsData"
+                    }
+                }
+            },
+            {
                 $project: {
                     name: 1,
                     email: 1,
                     avatar: 1,
-                    ratings: 1,
                     averageRating: 1,
-                    ratingCount: {
-                        $size: {
-                            $ifNull: ["$ratings", []]
-                        }
-                    }
+                    ratingCount: 1
                 }
             },
             {
@@ -434,13 +480,15 @@ module.exports.getRatedUser = async (req, res) => {
                 $limit: limit
             }
         ]);
-        if (!userWithRatings || userWithRatings.length === 0) {
+
+        if (!userWithRatings.length) {
             return res.status(404).json({
                 message: "لا يوجد مستخدمين"
             });
-        };
+        }
+
         const totalCount = await User.countDocuments();
-        return res.status(200).json({
+        res.status(200).json({
             message: "تم جلب جميع التقييمات بنجاح",
             data: userWithRatings,
             pagination: {
@@ -451,11 +499,12 @@ module.exports.getRatedUser = async (req, res) => {
             }
         });
     } catch (err) {
-        return res.status(500).json({
+        res.status(500).json({
             message: "حدث خطأ أثناء جلب البيانات",
             error: err.message
         });
     }
+
 }
 
 module.exports.getRatedUserById = async (req, res) => {
@@ -553,8 +602,8 @@ module.exports.getRatedUserById = async (req, res) => {
 
 module.exports.deleteUserRating = async (req, res) => {
     try {
-        const  ratedUserId = req.body.ratedUserId;
-        const  ratedByUserId = req.body.ratedByUserId;
+        const ratedUserId = req.body.ratedUserId;
+        const ratedByUserId = req.body.ratedByUserId;
         if (
             !mongoose.Types.ObjectId.isValid(ratedUserId) ||
             !mongoose.Types.ObjectId.isValid(ratedByUserId)
