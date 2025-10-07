@@ -1,5 +1,6 @@
 const User = require('../../models/users');
 const Products = require('../../models/products');
+const Rating = require('../../models/ratingSchema');
 const mongoose = require('mongoose');
 module.exports.GrantingPermissions = async (req, res) => {
     const user_id = req.body.user_id;
@@ -597,44 +598,39 @@ module.exports.getRatedUserById = async (req, res) => {
 }
 module.exports.deleteUserRating = async (req, res) => {
     try {
-        const ratedUserId = req.body.ratedUserId;
-        const ratedByUserId = req.body.ratedByUserId;
-        if (
-            !mongoose.Types.ObjectId.isValid(ratedUserId) ||
-            !mongoose.Types.ObjectId.isValid(ratedByUserId)
-        ) {
+        const ratingId = req.body.ratingId;
+        if (!mongoose.Types.ObjectId.isValid(ratingId)) {
             return res.status(400).json({
-                message: "معرّف المستخدم غير صالح"
+                message: "معرّف التقييم غير صالح",
             });
         }
-        const updatedUser = await User.findByIdAndUpdate(
-            ratedUserId, {
-                $pull: {
-                    ratings: {
-                        user_id: new mongoose.Types.ObjectId(ratedByUserId)
-                    }
-                }
-            }, {
-                new: true
-            }
-        );
-        if (!updatedUser) {
+        const rating = await Rating.findById(ratingId);
+        if (!rating) {
             return res.status(404).json({
-                message: "لم يتم العثور على المستخدم المستهدف"
+                message: "لم يتم العثور على التقييم",
             });
         }
-        if (updatedUser.ratings.length > 0) {
-            const avg =
-                updatedUser.ratings.reduce((sum, r) => sum + (r.rating || 0), 0) /
-                updatedUser.ratings.length;
-            updatedUser.averageRating = avg;
-        } else {
-            updatedUser.averageRating = 0;
+
+        const ratedUserId = rating.publish;
+        await Rating.findByIdAndDelete(ratingId);
+        const remainingRatings = await Rating.find({
+            publish: ratedUserId
+        });
+        let newAverage = 0;
+        if (remainingRatings.length > 0) {
+            const sum = remainingRatings.reduce((acc, r) => acc + r.rating, 0);
+            newAverage = sum / remainingRatings.length;
         }
-        await updatedUser.save();
+        await User.findByIdAndUpdate(ratedUserId, {
+            averageRating: newAverage,
+        });
         return res.status(200).json({
-            message: "تم حذف التقييم بنجاح",
-            data: updatedUser
+            message: "✅ تم حذف التقييم بنجاح وتحديث متوسط المستخدم",
+            data: {
+                deletedRatingId: ratingId,
+                ratedUserId,
+                newAverage,
+            },
         });
     } catch (err) {
         return res.status(500).json({
