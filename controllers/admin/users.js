@@ -288,7 +288,7 @@ module.exports.toggleBanUser = async (req, res) => {
             });
         }
         const user = await User.findByIdAndUpdate(user_id, {
-            updateData
+            ...updateData
         }, {
             new: true
         });
