@@ -86,7 +86,7 @@ module.exports.login = async (req, res) => {
             });
         } else if(user.Role === 'BANNED'){
             return res.status(403).json({
-                message: "هذا الإيميل محظور من قبل ال مسؤول"
+                message: "المسؤول هذا الإيميل محظور من قبل "
             });
         }
         else if (!(await user.matchPassword(password))) {

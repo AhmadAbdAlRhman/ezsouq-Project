@@ -88,7 +88,7 @@
             }
             if(user.Role === 'BANNED'){
                 return res.status(403).json({
-                    message: "هذا الإيميل محظور من قبل ال مسؤول"
+                    message: "هذا الإيميل محظور من قبل المسؤول"
                 });
             }
             const token = generateToken(user);
@@ -151,7 +151,7 @@
             }
             if(user.Role === 'BANNED'){
                 return res.status(403).json({
-                    message: "هذا الإيميل محظور من قبل ال مسؤول"
+                    message: "هذا الإيميل محظور من قبل المسؤول"
                 });
             }
             const tokeny = generateToken(user);
