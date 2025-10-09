@@ -92,18 +92,21 @@
                 });
             }
             const token = generateToken(user);
-            res.json({
-                message: "تمت المصادقة عن طريق ال جوجل",
-                token,
-                user: {
-                    googleId: id,
-                    _id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    Role: user.Role,
-                    avatar: user.avatar
-                }
-            });
+            return res.redirect(
+                `${process.env.FRONTEND_URL}?token=${token}`
+            )
+            // res.json({
+            //     message: "تمت المصادقة عن طريق ال جوجل",
+            //     token,
+            //     user: {
+            //         googleId: id,
+            //         _id: user._id,
+            //         name: user.name,
+            //         email: user.email,
+            //         Role: user.Role,
+            //         avatar: user.avatar
+            //     }
+            // });
 
         } catch (err) {
             console.error('OAuth Error:', err.message, err.response ?.data);
