@@ -29,7 +29,7 @@ module.exports.requestResetCode = async (req, res) => {
             text: `الكود هو : ${code}`
         });
         res.status(200).json({
-            message: "تم إرسال الكود ل الإيميل"
+            message: "تم إرسال الكود للإيميل"
         });
     })
 };
