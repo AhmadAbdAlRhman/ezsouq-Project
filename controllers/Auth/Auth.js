@@ -90,7 +90,7 @@ module.exports.login = async (req, res) => {
             });
         }else if (user.googleId && !user.password){
             return res.status(400).json({
-                message:"Google الرجاء تسجيل الدخول باستخدام .Google هذا الإيميل مسجل مسبقاً عبر "
+                message:"Google هذا الإيميل مستخدم من قبل، سجّل دخولك بحساب"
             });
         }
         else if (!(await user.matchPassword(password))) {
