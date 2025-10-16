@@ -88,9 +88,9 @@ module.exports.login = async (req, res) => {
             return res.status(403).json({
                 message: "المسؤول هذا الإيميل محظور من قبل "
             });
-        }else if (user.googleId){
+        }else if (user.googleId && !user.password){
             return res.status(400).json({
-                message:"Google الرجاء تسجيل الدخول باستخدام باستخدام .Google هذا الإيميل مسجل مسبقاً عبر "
+                message:"Google الرجاء تسجيل الدخول باستخدام .Google هذا الإيميل مسجل مسبقاً عبر "
             });
         }
         else if (!(await user.matchPassword(password))) {
