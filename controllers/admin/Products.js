@@ -81,7 +81,7 @@ module.exports.getTopProducts = async (_req, res) => {
             }
         ]);
 
-        res.json({
+        res.status(200).json({
             topLikedProducts
         });
     } catch (err) {
@@ -118,7 +118,7 @@ module.exports.DeleteProducts = async (req, res) => {
                 $in: ids
             }
         });
-        res.json({
+        res.status(200).json({
             message: `${ids.length} products deleted successfully`
         });
     } catch (err) {

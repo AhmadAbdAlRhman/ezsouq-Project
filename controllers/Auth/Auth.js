@@ -81,12 +81,16 @@ module.exports.login = async (req, res) => {
             email
         });
         if (!user) {
-            return res.status(404).json({
+            return res.status(400).json({
                 message: "المستخدم غير مسجل من قبل"
             });
         } else if(user.Role === 'BANNED'){
             return res.status(403).json({
                 message: "المسؤول هذا الإيميل محظور من قبل "
+            });
+        }else if (user.googleId){
+            return res.status(400).json({
+                message:"Google الرجاء تسجيل الدخول باستخدام باستخدام .Google هذا الإيميل مسجل مسبقاً عبر "
             });
         }
         else if (!(await user.matchPassword(password))) {
@@ -103,12 +107,12 @@ module.exports.login = async (req, res) => {
             },
             token: generateToken(user)
         });
-    } catch (err) {
-        res.status(500).json({
-            message: "Server error",
-            error: err.message
-        });
-    }
+        } catch (err) {
+            res.status(500).json({
+                message: "Server error",
+                error: err.message
+            });
+        }
 };
 
 module.exports.logout = async (req, res) => {

@@ -4,9 +4,9 @@ module.exports.addGovernorates = async (req, res) => {
     const name = req.body.name;
     const cities = req.body.cities;
     if (!name)
-        return res.status(404).json({
-            message: "الرجاء إدخال اسم المحافظة"
-        });
+            return res.status(404).json({
+                message: "الرجاء إدخال اسم المحافظة"
+            });
     await Governorates.findOne({
         name
     }).then(async (gov) => {
