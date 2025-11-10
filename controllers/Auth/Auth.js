@@ -29,15 +29,17 @@ module.exports.register = async (req, res) => {
         let user = await User.findOne({
             email
         });
-        if(user){
+        if (user) {
             if (!user.password) {
                 user.password = password;
                 user.name = user.name || name;
                 await user.save();
             } else {
-                return res.status(400).json({ message: "هذا البريد مستخدم مسبقًا" });
+                return res.status(400).json({
+                    message: "هذا البريد مستخدم مسبقًا"
+                });
             }
-        }else{
+        } else {
             user = await User.create({
                 name,
                 email,
@@ -84,16 +86,15 @@ module.exports.login = async (req, res) => {
             return res.status(400).json({
                 message: "المستخدم غير مسجل من قبل"
             });
-        } else if(user.Role === 'BANNED'){
+        } else if (user.Role === 'BANNED') {
             return res.status(403).json({
                 message: "المسؤول هذا الإيميل محظور من قبل "
             });
-        }else if (user.googleId && !user.password){
+        } else if (user.googleId && !user.password) {
             return res.status(400).json({
-                message:"Google هذا الإيميل مستخدم من قبل، سجّل دخولك بحساب"
+                message: "Google هذا الإيميل مستخدم من قبل، سجّل دخولك بحساب"
             });
-        }
-        else if (!(await user.matchPassword(password))) {
+        } else if (!(await user.matchPassword(password))) {
             return res.status(401).json({
                 message: "كلمة المرور غير صحيحة"
             });
@@ -107,12 +108,12 @@ module.exports.login = async (req, res) => {
             },
             token: generateToken(user)
         });
-        } catch (err) {
-            res.status(500).json({
-                message: "Server error",
-                error: err.message
-            });
-        }
+    } catch (err) {
+        res.status(500).json({
+            message: "Server error",
+            error: err.message
+        });
+    }
 };
 
 module.exports.logout = async (req, res) => {
@@ -143,5 +144,40 @@ module.exports.logout = async (req, res) => {
         return res.status(500).json({
             message: "حدث خطأ أثناء تسجيل الخروج"
         });
+    }
+}
+
+module.exports.delete_account = async (req, res) => {
+    try {
+        const id = req.user.id;
+        if (!id) {
+            return res.status(400).json({
+                message: "لم يتم إرسال المعرّف المطلوب"
+            });
+        }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "معرّف غير صالح"
+            });
+        }
+        const delete_account = await User.findByIdAndDelete(id);
+        if (!delete_account) {
+            return res.status(404).json({
+                message: "لا يوجد مثل هذا المستخدم"
+            });
+        }
+        res.status(200).json({
+            message: "تم حذف الحساب بنجاح",
+            deletedUser: {
+                id: deletedAccount._id,
+                email: deletedAccount.email,
+                name: deletedAccount.name
+            }
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "حدث خطأ أثناء حذف الحساب",
+            Error: err.message
+        })
     }
 }

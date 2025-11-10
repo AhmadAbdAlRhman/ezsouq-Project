@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const protect = require('../middleware/OAtuh');
 const OAuth = require("../controllers/Auth/OAuth");
 const Auth = require("../controllers/Auth/Auth");
 const reset = require("../controllers/Auth/rest_password");
@@ -12,6 +13,7 @@ router.post('/auth/google/AndroidLogin', OAuth.AndroidLogin);
 router.post('/register', Auth.register);
 router.post('/login', Auth.login);
 router.post('/logout', Auth.logout);
+router.delete('/delete_account',protect, Auth.logout);
 
 router.post("/request-code", reset.requestResetCode);
 router.post("/check_code", reset.checkCode);
