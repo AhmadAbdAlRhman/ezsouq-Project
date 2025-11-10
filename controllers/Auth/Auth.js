@@ -1,6 +1,7 @@
 const User = require("../../models/users");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
 const {
     registerSchema
 } = require("../../validation/user");
