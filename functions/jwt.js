@@ -7,6 +7,6 @@ module.exports.generateToken = (user) => {
         Role: user.Role,
         tokenVersion: user.tokenVersion
     }, process.env.JWT_SECRET, {
-        expiresIn: "30d"
+        expiresIn: "180d"
     });
 };
