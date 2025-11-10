@@ -170,9 +170,9 @@ module.exports.delete_account = async (req, res) => {
         res.status(200).json({
             message: "تم حذف الحساب بنجاح",
             deletedUser: {
-                id: deletedAccount._id,
-                email: deletedAccount.email,
-                name: deletedAccount.name
+                id: delete_account._id,
+                email: delete_account.email,
+                name: delete_account.name
             }
         })
     } catch (err) {
