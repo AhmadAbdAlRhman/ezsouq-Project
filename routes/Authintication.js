@@ -13,7 +13,7 @@ router.post('/auth/google/AndroidLogin', OAuth.AndroidLogin);
 router.post('/register', Auth.register);
 router.post('/login', Auth.login);
 router.post('/logout', Auth.logout);
-router.delete('/delete_account',protect, Auth.logout);
+router.delete('/delete_account',protect, Auth.delete_account);
 
 router.post("/request-code", reset.requestResetCode);
 router.post("/check_code", reset.checkCode);
