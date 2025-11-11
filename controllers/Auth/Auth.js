@@ -89,7 +89,7 @@ module.exports.login = async (req, res) => {
             });
         } else if (user.Role === 'BANNED') {
             return res.status(403).json({
-                message: "المسؤول هذا الإيميل محظور من قبل "
+                message: " هذا الإيميل محظور من قبل المسؤول"
             });
         } else if (user.googleId && !user.password) {
             return res.status(400).json({
