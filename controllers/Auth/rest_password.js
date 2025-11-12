@@ -91,7 +91,7 @@ module.exports.sendResetLink = async (req, res) => {
         user.resetToken = token;
         user.resetTokenExpire = Date.now() + 1000 * 60 * 10;
         await user.save();
-        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        const resetLink = `https://ezsouq.store/reset-password/${token}`;
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
