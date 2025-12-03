@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const User = require("../../models/users");
-const nodemailer = require("nodemailer");
+const { sendEmail } = require("../../servers/sendEmailCode");
 //This is for send Code to Email for mobile
 module.exports.requestResetCode = async (req, res) => {
     const email = req.body.email;
@@ -15,15 +15,7 @@ module.exports.requestResetCode = async (req, res) => {
         user.resetToken = code;
         user.resetTokenExpire = Date.now() + 1000 * 60 * 10;
         await user.save();
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            }
-        });
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        sendEmail({
             to: user.email,
             subject: "كود لتهائية كلمة المرور",
             text: `الكود هو : ${code}`
@@ -92,22 +84,10 @@ module.exports.sendResetLink = async (req, res) => {
         user.resetTokenExpire = Date.now() + 1000 * 60 * 10;
         await user.save();
         const resetLink = `https://ezsouq.store/reset-password/${token}`;
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        sendEmail({
             to: email,
             subject: "إعادة تهيأة كلمة المرور",
-            html: `
-        <p>اضغط على الإيموجي لتغير كلمة المرور:</p>
-        <a href="${resetLink}">🙋‍♂️🙋‍♂️</a>
-        <p>هذا الإيميل صالح لمدة 10 دقائق فقط</p>
-        `
+            text: ` ${resetLink}هذا الإيميل صالح لمدة 10 دقائق فقط`
         });
         res.status(200).json({
             message: "تم إرسال الرابط عن طريق الإيميل"

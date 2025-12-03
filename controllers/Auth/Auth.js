@@ -2,6 +2,8 @@ const User = require("../../models/users");
 const BlacklistToken = require("../../models/BlacklistToken");
 const jwt = require("jsonwebtoken");
 const mongoose = require('mongoose');
+let tempRegistrations = new Map();
+const crypto = require('crypto');
 const {
     registerSchema
 } = require("../../validation/user");
@@ -12,6 +14,13 @@ require('dotenv').config();
 const {
     generateToken
 } = require("../../functions/jwt");
+const {
+    cleanPhone
+} = require('../../functions/cleanPhone');
+const {
+    sendWhatsAppCode
+} = require("../../servers/sendWhatsAppCode");
+const { sendEmail } = require("../../servers/sendEmailCode");
 
 module.exports.register = async (req, res) => {
     try {
@@ -26,40 +35,134 @@ module.exports.register = async (req, res) => {
         }
         const name = req.body.name;
         const email = req.body.email;
+        const phone = req.body.phone;
         const password = req.body.password;
-        let user = await User.findOne({
-            email
-        });
-        if (user) {
-            if (!user.password) {
-                user.password = password;
-                user.name = user.name || name;
-                await user.save();
-            } else {
-                return res.status(400).json({
-                    message: "هذا البريد مستخدم مسبقًا"
-                });
-            }
-        } else {
-            user = await User.create({
-                name,
-                email,
-                password,
-                Role: 'USER',
-                tokenVersion: 0
+        if (!name || !password || (!email && !phone)) {
+            return res.status(400).json({
+                message: "يجب إدخال جميع الحقول المطلوبة"
             });
         }
-        res.status(201).json({
-            message: "تم إنشاء المستخدم بنجاح",
-            _id: user._id,
-            name: user.name,
-            Role: user.Role,
-            token: generateToken(user)
+        let cleanyphone = cleanPhone(phone);
+        let user = await User.findOne({
+            $or: [{
+                    email
+                },
+                {
+                    phone: cleanyphone
+                }
+            ]
+        });
+        if (user && !user.password) {
+            user.password = password;
+            user.name = user.name || name;
+            await user.save();
+            return res.json({
+                success: true,
+                message: "تم إضافة كلمة المرور لحسابك",
+                token: generateToken(user),
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone
+                }
+            });
+        }
+        if (user) {
+            return res.status(400).json({
+                message: "هذا الحساب موجود مسبقًا"
+            });
+        }
+        const sessionId = crypto.randomBytes(32).toString("hex");
+        tempRegistrations.set(sessionId, {
+            name,
+            email,
+            password,
+            phone: cleanyphone,
+            createdAt: Date.now()
+        });
+        res.status(200).json({
+            success: true,
+            sessionId,
+            hasEmail: !!email,
+            hasPhone: !!cleanyphone,
+            message: "اختر طريقة إرسال كود التحقق"
         });
     } catch (err) {
         res.status(500).json({
-            message: "حدث خطأ أثناء تسجيل الدخول",
+            message: "خطأ داخلي في السيرفر",
             error: err.message
+        });
+    }
+};
+
+module.exports.sendVerificationCode = async (req, res) => {
+    try {
+        const {
+            sessionId,
+            method
+        } = req.body;
+        const data = tempRegistrations.get(sessionId);
+        if (!data) {
+            return res.status(400).json({
+                message: "جلسة منتهية"
+            });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        data.verificationCode = code;
+        data.codeExpiresAt = Date.now() + 5 * 60 * 1000;
+        tempRegistrations.set(sessionId, data);
+        if (method === "email") await sendEmail({to:data.email,subject:'account activation code', text: `كودك هو: ${code}\nصالح لمدة 5 دقايق`});
+        if (method === "whatsapp") await sendWhatsAppCode(data.phone, code);
+        res.json({
+            success: true,
+            message: "تم إرسال الكود"
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "خطأ في السيرفر",
+            Error: err.message
+        })
+    }
+};
+
+module.exports.verifyAndRegister = async (req, res) => {
+    try {
+        const {
+            sessionId,
+            code
+        } = req.body;
+        const data = tempRegistrations.get(sessionId);
+        if (!data || Date.now() > data.codeExpiresAt || data.verificationCode !== code) {
+            tempRegistrations.delete(sessionId);
+            return res.status(400).json({
+                message: "الكود خاطئ أو منتهي"
+            });
+        }
+        const user = await User.create({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            password: data.password,
+            verifiedAt: new Date(),
+            Role: 'USER'
+        });
+        tempRegistrations.delete(sessionId);
+        res.status(201).json({
+            success: true,
+            message: "تم التسجيل بنجاح!",
+            token: generateToken(user),
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "خطأ في إنشاء الحساب",
+            Error: err.message
         });
     }
 };
@@ -146,7 +249,7 @@ module.exports.logout = async (req, res) => {
             message: "حدث خطأ أثناء تسجيل الخروج"
         });
     }
-}
+};
 
 module.exports.delete_account = async (req, res) => {
     try {
@@ -181,4 +284,4 @@ module.exports.delete_account = async (req, res) => {
             Error: err.message
         })
     }
-}
+};

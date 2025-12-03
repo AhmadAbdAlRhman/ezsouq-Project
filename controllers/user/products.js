@@ -118,6 +118,7 @@ module.exports.addProduct = async (req, res) => {
             city,
             description,
             price,
+            unit,
             color,
             engine_type,
             isnew,
@@ -129,7 +130,7 @@ module.exports.addProduct = async (req, res) => {
             storage
         } = req.body;
 
-        if (!name || !description || !Category_name || !Governorate_name || !city || !price) {
+        if (!name || !description || !Category_name || !Governorate_name || !city ) {
             return res.status(400).json({
                 message: "الرجاء تعبئة جميع الحقول الأساسية."
             });
@@ -164,6 +165,7 @@ module.exports.addProduct = async (req, res) => {
             main_photos: mainPhotos,
             description,
             price,
+            unit,
             video,
             photos: optionalPhotos,
             color,
@@ -244,6 +246,7 @@ module.exports.getOneProduct = async (req, res) => {
                     name: 1,
                     description: 1,
                     price: 1,
+                    unit: 1,
                     commentsCount: 1,
                     Category_name: 1,
                     Governorate_name: 1,
@@ -389,6 +392,7 @@ module.exports.search = async (req, res) => {
                     name: 1,
                     description: 1,
                     price: 1,
+                    unit: 1,
                     Category_name: 1,
                     Governorate_name: 1,
                     city: 1,
@@ -552,6 +556,7 @@ module.exports.getAllSaved = async (req, res) => {
                     name: 1,
                     main_photos: 1,
                     price: 1,
+                    unit: 1,
                     Category_name: 1,
                     Governorate_name: 1,
                     city: 1,

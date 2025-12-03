@@ -42,6 +42,8 @@ module.exports.getTopProducts = async (_req, res) => {
                         $arrayElemAt: ["$main_photos", 0]
                     },
                     views: 1,
+                    price: 1,
+                    unit:1 ,
                     totalLikes: {
                         $size: {
                             $ifNull: ["$likes", []]
@@ -75,6 +77,8 @@ module.exports.getTopProducts = async (_req, res) => {
                     main_photo: 1,
                     Governorate_name:1,
                     city:1,
+                    price: 1,
+                    unit: 1,
                     views: 1,
                     totalLikes: 1,
                 }

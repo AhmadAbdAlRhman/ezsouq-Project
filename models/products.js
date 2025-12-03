@@ -34,7 +34,11 @@ const ProductsSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true,
+        required: false,
+    },
+    unit:{
+        type: String,
+        required:  false
     },
     video: String,
     //just for mobile and car
