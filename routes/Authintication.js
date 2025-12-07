@@ -22,5 +22,5 @@ router.post("/send_reset_link", reset.sendResetLink);
 router.post("/change_password_link", reset.changePasswordLink);
 
 router.post('/send_code', Auth.sendVerificationCode);
-router.post('/verfied_code&store_information', Auth.verifyAndRegister);
+router.post('/verfied_code_store_information', Auth.verifyAndRegister);
 module.exports = router;
