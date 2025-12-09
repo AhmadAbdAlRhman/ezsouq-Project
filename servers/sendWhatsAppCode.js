@@ -21,31 +21,22 @@ const sendWhatsAppCode = async (phone, code) => {
             timeout: 10000
         });
         console.log(`تم إرسال الكود بنجاح إلى ${phone} ✅`);
+        console.log(response.data._data.Message.extendedTextMessage.text);
         return {
-            success: true,
-            phone: phone,
-            messageId: response.data?.msg_id || null
+            ok: true,
+            data: response.data
         };
+        return response.data;
     } catch (error) {
-        const errMsg = error.response?.data?.message || error.message;
-        console.log(errMsg);
-        if (errMsg === "Something went wrong, please try again later.") {
-            return {
-                success: false,
-                phone,
-                reason: "الرقم غير مسجّل على واتساب ❌"
-            };
+        const serverMessage = error.response?.data?.message || error.message;
+        if (serverMessage.includes("Something went wrong, please try again later.")) {
+            console.log("⛔ تحقق من الرقم رجاءً.");
+            throw new Error("الرقم غير مسجّل على واتساب ❌");
         }
-
-        // باقي الأخطاء
-        console.error(`فشل إرسال الكود إلى ${phone}:`, errMsg);
-
-        return {
-            success: false,
-            phone,
-            reason: "خطأ غير متوقع",
-            error: errMsg
-        };
+        if (serverMessage) {
+            throw new Error(`خطأ من HyperSender: ${serverMessage}`);
+        }
+        throw new Error(`فشل إرسال الكود: ${error.message}`);
     }
 }
 
