@@ -4,7 +4,6 @@ const API_KEY = process.env.HYPERSENDER_API_KEY;
 const API_Authentication = process.env.HYPERSENDER_Authentication;
 const HYPERSENDER_API = `https://app.hypersender.com/api/whatsapp/v1/${API_KEY}/send-text`;
 const sendWhatsAppCode = async (phone, code) => {
-    console.log(HYPERSENDER_API);
     try {
         const chatId = `${phone}@c.us`;
         const payload = {
@@ -28,7 +27,14 @@ const sendWhatsAppCode = async (phone, code) => {
             messageId: response.data?.msg_id || null
         };
     } catch (error) {
-        const errMsg = error.response ?.data || error.message;
+        const errMsg = error.response?.data.message || error.message;
+        if (errMsg === "Something went wrong, please try again later.") {
+            return {
+                success: false,
+                phone,
+                reason: "يرجى التأكد من الرقم ❌"
+            };
+        }
         console.error(`فشل إرسال الكود إلى ${phone}:`, errMsg);
         throw new Error(
             error.response ?

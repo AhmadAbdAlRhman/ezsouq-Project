@@ -165,6 +165,7 @@ module.exports.getProdUser = async (req, res) => {
                     name: 1,
                     description: 1,
                     price: 1,
+                    unit:1,
                     Category_name: 1,
                     Governorate_name: 1,
                     city: 1,
