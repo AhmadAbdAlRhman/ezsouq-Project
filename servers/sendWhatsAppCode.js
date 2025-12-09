@@ -27,20 +27,25 @@ const sendWhatsAppCode = async (phone, code) => {
             messageId: response.data?.msg_id || null
         };
     } catch (error) {
-        const errMsg = error.response?.data.message || error.message;
+        const errMsg = error.response?.data?.message || error.message;
+        console.log(errMsg);
         if (errMsg === "Something went wrong, please try again later.") {
             return {
                 success: false,
                 phone,
-                reason: "يرجى التأكد من الرقم ❌"
+                reason: "الرقم غير مسجّل على واتساب ❌"
             };
         }
+
+        // باقي الأخطاء
         console.error(`فشل إرسال الكود إلى ${phone}:`, errMsg);
-        throw new Error(
-            error.response ?
-            `HyperSender Error: ${JSON.stringify(error.response.data)}` :
-            `فشل الإرسال: ${error.message}`
-        );
+
+        return {
+            success: false,
+            phone,
+            reason: "خطأ غير متوقع",
+            error: errMsg
+        };
     }
 }
 
