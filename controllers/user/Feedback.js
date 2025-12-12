@@ -1,5 +1,10 @@
 const Feedback = require('../../models/feedback');
+const Notification = require('../../models/Notification');
+const Products = require('../../models/products');
+const User = require('../../models/users');
+const { sendNotificationToUser } = require('../../socket/socket');
 const mongoose = require('mongoose');
+
 module.exports.comment = async (req, res) => {
     const user_id = req.user.id;
     const product_id = req.body.product_id;
@@ -9,20 +14,85 @@ module.exports.comment = async (req, res) => {
         return res.status(404).json({
             message: 'الرجاء تعبئة جميع الحقول المطلوبة'
         });
-    const newFeedback = new Feedback({
-        comments,
-        user_id,
-        product_id,
-        parent_comment: parent_comment || null
-    });
-    await newFeedback.save().then(() => {
+    
+    try {
+        // الحصول على Socket.io من app
+        const io = req.app.get('io');
+        
+        const newFeedback = new Feedback({
+            comments,
+            user_id,
+            product_id,
+            parent_comment: parent_comment || null
+        });
+        await newFeedback.save();
+
+        // الحصول على معلومات المنتج والمستخدم
+        const product = await Products.findById(product_id).populate('Owner_id', 'name avatar');
+        const commenter = await User.findById(user_id, 'name avatar');
+
+        // إنشاء إشعار لصاحب المنتج (فقط إذا لم يكن هو من علق)
+        if (product && product.Owner_id && product.Owner_id._id.toString() !== user_id) {
+            const notificationMessage = parent_comment 
+                ? `قام ${commenter.name} بالرد على تعليقك في منشور "${product.name}"`
+                : `قام ${commenter.name} بالتعليق على منشورك "${product.name}"`;
+
+            const notification = await Notification.create({
+                user_id: product.Owner_id._id,
+                type: parent_comment ? 'reply' : 'comment',
+                message: notificationMessage,
+                product_id: product_id,
+                comment_id: newFeedback._id,
+                from_user_id: user_id,
+                isRead: false
+            });
+
+            // إرسال الإشعار عبر Socket
+            if (io) {
+                const notificationData = await Notification.findById(notification._id)
+                    .populate('from_user_id', 'name avatar')
+                    .populate('product_id', 'name main_photos')
+                    .populate('comment_id', 'comments');
+                
+                sendNotificationToUser(io, product.Owner_id._id.toString(), notificationData);
+            }
+        }
+
+        // إذا كان التعليق رد على تعليق آخر، أرسل إشعار لصاحب التعليق الأصلي
+        if (parent_comment) {
+            const parentComment = await Feedback.findById(parent_comment).populate('user_id', 'name avatar');
+            if (parentComment && parentComment.user_id && parentComment.user_id._id.toString() !== user_id) {
+                const notificationMessage = `قام ${commenter.name} بالرد على تعليقك في منشور "${product.name}"`;
+                
+                const notification = await Notification.create({
+                    user_id: parentComment.user_id._id,
+                    type: 'reply',
+                    message: notificationMessage,
+                    product_id: product_id,
+                    comment_id: newFeedback._id,
+                    from_user_id: user_id,
+                    isRead: false
+                });
+
+                // إرسال الإشعار عبر Socket
+                if (io) {
+                    const notificationData = await Notification.findById(notification._id)
+                        .populate('from_user_id', 'name avatar')
+                        .populate('product_id', 'name main_photos')
+                        .populate('comment_id', 'comments');
+                    
+                    sendNotificationToUser(io, parentComment.user_id._id.toString(), notificationData);
+                }
+            }
+        }
+
         res.status(201).json(newFeedback);
-    }).catch((err) => {
+    } catch (err) {
         res.status(500).json({
             message: 'حدث خطأ أثناء إضافة التعليق',
             Error: err.message
         });
-    });
+    }
 }
 
 module.exports.getAllCommentForProduct = async (req, res) => {

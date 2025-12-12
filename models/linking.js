@@ -11,3 +11,4 @@ require('./feedback');
 require('./Report');
 require('./Message');
 require('./ratingSchema');
+require('./Notification');

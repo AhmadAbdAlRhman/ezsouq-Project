@@ -6,6 +6,7 @@ const user = require('../controllers/user/user');
 const feedback = require('../controllers/user/Feedback');
 const report = require('../controllers/user/Reported');
 const message = require('../controllers/user/message');
+const notification = require('../controllers/user/Notification');
 const {upload, uploadimage} = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 const checkRole = require('../middleware/checkRole');
@@ -44,6 +45,12 @@ router.put('/photo', protect, uploadimage.single("avatar"),user.addPhoto);
 router.get("/user_photo/:user_id", user.getOnePhotoByUserId);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post("/contact",message.sendMessage);
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+router.get('/notifications', protect, notification.getNotifications);
+router.get('/notifications/unread-count', protect, notification.getUnreadCount);
+router.put('/notifications/:notification_id/read', protect, notification.markAsRead);
+router.put('/notifications/read-all', protect, notification.markAllAsRead);
+router.delete('/notifications/:notification_id', protect, notification.deleteNotification);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/add_product',
     protect,

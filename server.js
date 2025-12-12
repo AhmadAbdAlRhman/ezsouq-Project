@@ -1,7 +1,28 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
+const server = http.createServer(app);
+
+// إعداد Socket.io
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: '*',
+        credentials: true
+    }
+});
+
+// إعداد Socket
+const { setupSocket } = require('./socket/socket');
+setupSocket(io);
+
+// جعل io متاحاً في التطبيق
+app.set('io', io);
+
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -24,6 +45,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.listen(3010, () => {
+server.listen(3010, () => {
     console.log(`🚀 Server listening on http://localhost:3010`);
+    console.log(`🔌 Socket.io ready for connections`);
 })
