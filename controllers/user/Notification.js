@@ -8,9 +8,7 @@ module.exports.getNotifications = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-
         const total = await Notification.countDocuments({ user_id });
-        
         const notifications = await Notification.find({ user_id })
             .populate('from_user_id', 'name avatar')
             .populate('product_id', 'name main_photos')

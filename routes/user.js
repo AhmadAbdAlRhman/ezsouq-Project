@@ -7,7 +7,10 @@ const feedback = require('../controllers/user/Feedback');
 const report = require('../controllers/user/Reported');
 const message = require('../controllers/user/message');
 const notification = require('../controllers/user/Notification');
-const {upload, uploadimage} = require('../middleware/upload_files');
+const {
+    upload,
+    uploadimage
+} = require('../middleware/upload_files');
 const protect = require('../middleware/OAtuh');
 const checkRole = require('../middleware/checkRole');
 
@@ -20,11 +23,11 @@ router.get('/fliteredProducts', products.getAllProducts);
 router.get('/product/:id', products.getOneProduct);
 router.get('/search_product', products.search);
 router.get('/get_all_likes', products.getAllLikes)
-router.get('/get_all_wishes',protect, products.getAllSaved)
+router.get('/get_all_wishes', protect, products.getAllSaved)
 router.post('/favorite/toggle', protect, products.toggleFavorite);
 router.post('/likedProduct', protect, products.toggleLike);
-router.put('/set_count_views/:productId',protect, products.setViews);
-router.delete('/delete_product/:productId',protect, products.deleteProduct);
+router.put('/set_count_views/:productId', protect, products.setViews);
+router.delete('/delete_product/:productId', protect, products.deleteProduct);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.post('/report_user', protect, report.report);
 router.get('/get_one_report/:reporteId', protect, report.get_one_reporte);
@@ -41,10 +44,10 @@ router.get('/get_user/:user_id', user.getInfoUser);
 router.get('/get_product_user/:user_id', user.getProdUser);
 router.put('/update_information', protect, user.updateInformationUser);
 router.post('/rating_publisher', protect, user.ratingPublisher);
-router.put('/photo', protect, uploadimage.single("avatar"),user.addPhoto);
+router.put('/photo', protect, uploadimage.single("avatar"), user.addPhoto);
 router.get("/user_photo/:user_id", user.getOnePhotoByUserId);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-router.post("/contact",message.sendMessage);
+router.post("/contact", message.sendMessage);
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 router.get('/notifications', protect, notification.getNotifications);
 router.get('/notifications/unread-count', protect, notification.getUnreadCount);

@@ -86,7 +86,7 @@
                 if (!user.name) user.name = name;
                 await user.save();
             }
-            if(user.Role === 'BANNED'){
+            if (user.Role === 'BANNED') {
                 return res.status(403).json({
                     message: "هذا الإيميل محظور من قبل المسؤول"
                 });
@@ -121,38 +121,56 @@
         try {
             const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
             const token = req.body.token;
+            if (!token) {
+                return res.status(400).json({
+                    message: 'Google token is required',
+                });
+            }
             const ticket = await client.verifyIdToken({
                 idToken: token,
                 audience: process.env.GOOGLE_CLIENT_ID,
             });
             const payload = ticket.getPayload();
             const {
-                sub,
+                sub: googleId,
                 email,
                 name,
                 picture
             } = payload;
-            let user = await User.findOne({
-                email
-            });
-            if (user) {
-                if (!user.googleId) {
-                    user.googleId = sub;
-                    user.avatar = user.avatar || picture;
-                    user.name = user.name || name;
-                    await user.save();
-
-                }
-            } else {
-                user = await User.create({
-                    googleId: sub,
-                    email,
-                    name,
-                    avatar: picture,
-                    Role: 'USER'
+            if (!payload.email_verified) {
+                return res.status(400).json({
+                    message: 'الإيميل غير موثق من Google'
                 });
             }
-            if(user.Role === 'BANNED'){
+            if (!email) {
+                return res.status(400).json({
+                    message: 'حساب الجوجل ليس لديه إيميل',
+                });
+            }
+            let user = await User.findOneAndUpdate({
+                    email
+                },
+                {
+                    $setOnInsert: {
+                        googleId,
+                        name,
+                        avatar: picture,
+                        Role: 'USER'
+                    }
+                }, {
+                    upsert: true,
+                    new: true,
+                    setDefaultsOnInsert: true
+                }
+            );
+
+            if (user.googleId !== googleId) {
+                user.googleId = googleId;
+                user.avatar = user.avatar || picture;
+                user.name = user.name || name;
+                await user.save();
+            }
+            if (user.Role === 'BANNED') {
                 return res.status(403).json({
                     message: "هذا الإيميل محظور من قبل المسؤول"
                 });
