@@ -686,14 +686,23 @@ module.exports.setViews = async (req, res) => {
 module.exports.deleteProduct = async (req, res) => {
     try {
         const product_id = req.params.productId;
-        const product = await Products.findByIdAndDelete(product_id);
+        // جلب المنتج أولاً لحذف ملفاته
+        const product = await Products.findById(product_id);
         if (!product) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "لم يتم العثور على المنتج"
             });
         }
+        
+        // حذف الملفات (الصور والفيديوهات)
+        const { deleteProductFiles } = require('../../functions/deleteFiles');
+        await deleteProductFiles(product);
+        
+        // حذف المنتج من قاعدة البيانات
+        await Products.findByIdAndDelete(product_id);
+        
         res.status(200).json({
-            message: "تم حذف المنتج بنجاح"
+            message: "تم حذف المنتج وملفاته بنجاح"
         })
     } catch (err) {
         res.status(500).json({

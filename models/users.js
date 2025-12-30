@@ -82,12 +82,42 @@ UserSchema.pre("save", async function (next) {
 });
 UserSchema.pre('remove', async function (next) {
     try {
+        const { deleteUserFiles, deleteAllUserProductFiles } = require('../functions/deleteFiles');
+        
+        // حذف ملفات جميع منتجات المستخدم
+        await deleteAllUserProductFiles(this._id);
+        
+        // حذف منتجات المستخدم من قاعدة البيانات
         await Product.deleteMany({
             Owner_id: this._id
         });
+        
+        // حذف ملفات المستخدم
+        await deleteUserFiles(this);
+        
         next();
     } catch (err) {
         next(err);
+    }
+});
+
+// Hook لحذف الملفات عند استخدام findByIdAndDelete
+UserSchema.pre('findOneAndDelete', async function() {
+    const user = await this.model.findOne(this.getQuery());
+    if (user) {
+        const { deleteUserFiles, deleteAllUserProductFiles } = require('../functions/deleteFiles');
+        
+        // حذف ملفات جميع منتجات المستخدم
+        await deleteAllUserProductFiles(user._id);
+        
+        // حذف منتجات المستخدم من قاعدة البيانات (سيتم حذفها تلقائياً بواسطة pre('remove') hook)
+        // لكن يجب حذفها هنا أيضاً لأن findByIdAndDelete لا يستدعي pre('remove')
+        await Product.deleteMany({
+            Owner_id: user._id
+        });
+        
+        // حذف ملفات المستخدم
+        await deleteUserFiles(user);
     }
 });
 UserSchema.methods.matchPassword = async function (enteredPassword) {

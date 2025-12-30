@@ -117,13 +117,21 @@ module.exports.DeleteProducts = async (req, res) => {
                 message: "لم يتم العثور على أي منتجات بهذه الأرقام"
             });
         }
+        
+        // حذف ملفات جميع المنتجات
+        const { deleteProductFiles } = require('../../functions/deleteFiles');
+        for (const product of existingProducts) {
+            await deleteProductFiles(product);
+        }
+        
+        // حذف المنتجات من قاعدة البيانات
         await Products.deleteMany({
             _id: {
                 $in: ids
             }
         });
         res.status(200).json({
-            message: `${ids.length} products deleted successfully`
+            message: `تم حذف ${ids.length} منتج وملفاته بنجاح`
         });
     } catch (err) {
         res.status(500).json({

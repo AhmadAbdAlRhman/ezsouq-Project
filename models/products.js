@@ -124,5 +124,31 @@ const ProductsSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// Hook لحذف الملفات عند حذف المنتج
+ProductsSchema.pre('findOneAndDelete', async function() {
+    try {
+        const product = await this.model.findOne(this.getQuery());
+        if (product) {
+            const { deleteProductFiles } = require('../functions/deleteFiles');
+            await deleteProductFiles(product);
+        }
+    } catch (err) {
+        console.error('خطأ في hook حذف ملفات المنتج:', err);
+    }
+});
+
+ProductsSchema.pre('deleteOne', async function() {
+    try {
+        const product = await this.model.findOne(this.getQuery());
+        if (product) {
+            const { deleteProductFiles } = require('../functions/deleteFiles');
+            await deleteProductFiles(product);
+        }
+    } catch (err) {
+        console.error('خطأ في hook حذف ملفات المنتج:', err);
+    }
+});
+
 const Products = mongoose.model("Products", ProductsSchema);
 module.exports = Products;
